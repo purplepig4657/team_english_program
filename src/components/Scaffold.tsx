@@ -1,4 +1,6 @@
+import { Box } from "@mui/material"
 import React from "react"
+import { drawerWidth } from "../constants/GlobalConstants"
 
 type ScaffoldProps = {
     children?: React.ReactNode,
@@ -27,10 +29,12 @@ const Scaffold: React.FC<ScaffoldProps> = ({
     ...otherAttributes
 }) => {
     return (
-        <div id={id} className={className}
-            style={{
+        <Box id={id} className={className}
+            sx={{
                 height: height,
-                width: width,
+                width: { sm: `calc(${scaffoldConstant.SCREEN_WIDTH} - ${drawerWidth}px)` },
+                pt: "60px",
+                ml: { sm: `${drawerWidth}px` },
                 minHeight: minheight,
                 minWidth: minwidth,
                 overflow: 'auto',
@@ -38,7 +42,7 @@ const Scaffold: React.FC<ScaffoldProps> = ({
             }}
         >
             {children}
-        </div>
+        </Box>
     )
 }
 
