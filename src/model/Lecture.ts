@@ -1,3 +1,7 @@
+import firebase from "firebase/compat";
+import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+import SnapshotOptions = firebase.firestore.SnapshotOptions;
+
 import LectureId from "./identifier/LectureId";
 import StudentLectureIssueId from "./identifier/StudentLectureIssueId";
 
@@ -34,5 +38,25 @@ export default class Lecture {
 
     get studentLectureIssueIdList(): Array<StudentLectureIssueId> {
         return this._studentLectureIssueIdList;
+    }
+}
+
+export const lectureConverter = {
+    toFirestore: (lectureData: Lecture) => {
+        return {
+            id: lectureData.id,
+            name: lectureData.name,
+            teacherName: lectureData.teacherName,
+            studentLectureIssueIdList: lectureData.studentLectureIssueIdList,
+        };
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+        const data = snapshot.data(options);
+        return new Lecture(
+            data.id,
+            data.name,
+            data.teacherName,
+            data.studentLectureIssueIdList
+        );
     }
 }

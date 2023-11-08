@@ -1,3 +1,7 @@
+import firebase from "firebase/compat";
+import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+import SnapshotOptions = firebase.firestore.SnapshotOptions;
+
 import ClassId from "./identifier/ClassId";
 import StudentId from "./identifier/StudentId";
 import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
@@ -48,5 +52,27 @@ export default class Student {
 
     get tuitionPaymentIdList(): Array<TuitionPaymentId> {
         return this._tuitionPaymentIdList;
+    }
+}
+
+export const studentConverter = {
+    toFirestore: (studentData: Student) => {
+        return {
+            id: studentData.id,
+            classIdList: studentData.classIdList,
+            name: studentData.name,
+            studentWeekIssueIdList: studentData.studentWeekIssueIdList,
+            tuitionPaymentIdList: studentData.tuitionPaymentIdList,
+        };
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+        const data = snapshot.data(options);
+        return new Student(
+            data.id,
+            data.classIdList,
+            data.name,
+            data.studentWeekIssueIdList,
+            data.tuitionPaymentIdList
+        );
     }
 }

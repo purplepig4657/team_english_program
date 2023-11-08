@@ -1,3 +1,7 @@
+import firebase from "firebase/compat";
+import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+import SnapshotOptions = firebase.firestore.SnapshotOptions;
+
 export default class Issue {
     private _lateness: number;
     private _absence: number;
@@ -60,5 +64,33 @@ export default class Issue {
 
     get scoreIssueComment(): string | null {
         return this._scoreIssueComment;
+    }
+}
+
+export const issueConverter = {
+    toFirestore: (issueData: Issue) => {
+        return {
+            lateness: issueData.lateness,
+            absence: issueData.absence,
+            attitude: issueData.attitude,
+            scoreIssue: issueData.scoreIssue,
+            latenessComment: issueData.latenessComment,
+            absenceComment: issueData.absenceComment,
+            attitudeComment: issueData.attitudeComment,
+            scoreIssueComment: issueData.scoreIssueComment
+        };
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+        const data = snapshot.data(options);
+        return new Issue(
+            data.lateness,
+            data.absence,
+            data.attitude,
+            data.scoreIssue,
+            data.latenessComment,
+            data.absenceComment,
+            data.attitudeComment,
+            data.scoreIssueComment
+        );
     }
 }

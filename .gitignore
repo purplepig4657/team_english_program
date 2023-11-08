@@ -10,3 +10,6 @@
 
 # secret
 .env
+
+# jetbrains
+.idea

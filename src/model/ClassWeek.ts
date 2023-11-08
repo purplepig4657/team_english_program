@@ -1,3 +1,7 @@
+import firebase from "firebase/compat";
+import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+import SnapshotOptions = firebase.firestore.SnapshotOptions;
+
 import ClassWeekId from "./identifier/ClassWeekId";
 import LectureId from "./identifier/LectureId";
 import WeekId from "./identifier/WeekId";
@@ -40,5 +44,20 @@ export default class ClassWeek {
 
     get lectureIdList(): Array<LectureId> {
         return this._lectureIdList;
+    }
+}
+
+export const classWeekConverter = {
+    toFirestore: (classWeekData: ClassWeek) => {
+        return {
+            id: classWeekData.id,
+            weekId: classWeekData.weekId,
+            weekName: classWeekData.weekName,
+            lectureIdList: classWeekData.lectureIdList
+        };
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+        const data = snapshot.data(options);
+        return new ClassWeek(data.id, data.weekId, data.weekName, data.lectureIdList);
     }
 }

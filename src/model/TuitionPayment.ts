@@ -1,3 +1,7 @@
+import firebase from "firebase/compat";
+import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+import SnapshotOptions = firebase.firestore.SnapshotOptions;
+
 import TuitionPaymentId from "./identifier/TuitionPaymentId";
 
 export default class TuitionPayment {
@@ -27,5 +31,23 @@ export default class TuitionPayment {
 
     get paymentDate(): Date {
         return this._paymentDate;
+    }
+}
+
+export const tuitionPaymentConverter = {
+    toFirestore: (tuitionPaymentData: TuitionPayment) => {
+        return {
+            id: tuitionPaymentData.id,
+            amount: tuitionPaymentData.amount,
+            paymentDate: tuitionPaymentData.paymentDate,
+        };
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+        const data = snapshot.data(options);
+        return new TuitionPayment(
+            data.id,
+            data.amount,
+            data.paymentDate.toDate() // Convert Firestore Timestamp to JavaScript Date
+        );
     }
 }

@@ -1,3 +1,7 @@
+import firebase from "firebase/compat";
+import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+import SnapshotOptions = firebase.firestore.SnapshotOptions;
+
 import Issue from "./Issue";
 import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
 import WeekId from "./identifier/WeekId";
@@ -42,5 +46,39 @@ export default class StudentWeekIssue extends Issue {
 
     get weekName(): string {
         return this._weekName;
+    }
+}
+
+export const studentWeekIssueConverter = {
+    toFirestore: (studentWeekIssueData: StudentWeekIssue) => {
+        return {
+            id: studentWeekIssueData.id,
+            weekId: studentWeekIssueData.weekId,
+            weekName: studentWeekIssueData.weekName,
+            lateness: studentWeekIssueData.lateness,
+            absence: studentWeekIssueData.absence,
+            attitude: studentWeekIssueData.attitude,
+            scoreIssue: studentWeekIssueData.scoreIssue,
+            latenessComment: studentWeekIssueData.latenessComment,
+            absenceComment: studentWeekIssueData.absenceComment,
+            attitudeComment: studentWeekIssueData.attitudeComment,
+            scoreIssueComment: studentWeekIssueData.scoreIssueComment
+        };
+    },
+    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+        const data = snapshot.data(options);
+        return new StudentWeekIssue(
+            data.id,
+            data.weekId,
+            data.weekName,
+            data.lateness,
+            data.absence,
+            data.attitude,
+            data.scoreIssue,
+            data.latenessComment,
+            data.absenceComment,
+            data.attitudeComment,
+            data.scoreIssueComment
+        );
     }
 }
