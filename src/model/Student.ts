@@ -8,7 +8,7 @@ import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
 import TuitionPaymentId from "./identifier/TuitionPaymentId";
 
 export default class Student {
-    private _id: StudentId;
+    private readonly _id: StudentId;
     private _classIdList: Array<ClassId>;
     private _name: string;
     private _studentWeekIssueIdList: Array<StudentWeekIssueId>;

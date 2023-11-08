@@ -6,7 +6,7 @@ import LectureId from "./identifier/LectureId";
 import StudentLectureIssueId from "./identifier/StudentLectureIssueId";
 
 export default class Lecture {
-    private _id: LectureId;
+    private readonly _id: LectureId;
     private _name: string;
     private _teacherName: string;
     private _studentLectureIssueIdList: Array<StudentLectureIssueId>;

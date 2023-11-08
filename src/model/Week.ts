@@ -5,7 +5,7 @@ import SnapshotOptions = firebase.firestore.SnapshotOptions;
 import WeekId from "./identifier/WeekId";
 
 export default class Week {
-    private _id: WeekId;
+    private readonly _id: WeekId;
     private _name: string;
 
     public constructor(id: WeekId, name: string) {

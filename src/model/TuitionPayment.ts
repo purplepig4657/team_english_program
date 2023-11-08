@@ -5,7 +5,7 @@ import SnapshotOptions = firebase.firestore.SnapshotOptions;
 import TuitionPaymentId from "./identifier/TuitionPaymentId";
 
 export default class TuitionPayment {
-    private _id: TuitionPaymentId;
+    private readonly _id: TuitionPaymentId;
     private _amount: number;
     private _paymentDate: Date;
 

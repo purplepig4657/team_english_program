@@ -7,8 +7,8 @@ import StudentId from "./identifier/StudentId";
 import StudentLectureIssueId from "./identifier/StudentLectureIssueId";
 
 export default class StudentLectureIssue extends Issue {
-    private _id: StudentLectureIssueId;
-    private _studentId: StudentId;
+    private readonly _id: StudentLectureIssueId;
+    private readonly _studentId: StudentId;
 
     constructor(
         id: StudentLectureIssueId,

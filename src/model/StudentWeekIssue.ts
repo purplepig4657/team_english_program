@@ -7,14 +7,12 @@ import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
 import WeekId from "./identifier/WeekId";
 
 export default class StudentWeekIssue extends Issue {
-    private _id: StudentWeekIssueId;
-    private _weekId: WeekId;
-    private _weekName: string;
+    private readonly _id: StudentWeekIssueId;
+    private readonly _weekId: WeekId;
 
     constructor(
         id: StudentWeekIssueId,
         weekId: WeekId,
-        weekName: string,
         lateness: number,
         absence: number,
         attitude: number,
@@ -27,7 +25,6 @@ export default class StudentWeekIssue extends Issue {
         super(lateness, absence, attitude, scoreIssue, latenessComment, absenceComment, attitudeComment, scoreIssueComment);
         this._id = id;
         this._weekId = weekId;
-        this._weekName = weekName;
     }
 
     // Getter
@@ -44,9 +41,6 @@ export default class StudentWeekIssue extends Issue {
         return this._weekId;
     }
 
-    get weekName(): string {
-        return this._weekName;
-    }
 }
 
 export const studentWeekIssueConverter = {
@@ -54,7 +48,6 @@ export const studentWeekIssueConverter = {
         return {
             id: studentWeekIssueData.id,
             weekId: studentWeekIssueData.weekId,
-            weekName: studentWeekIssueData.weekName,
             lateness: studentWeekIssueData.lateness,
             absence: studentWeekIssueData.absence,
             attitude: studentWeekIssueData.attitude,
@@ -70,7 +63,6 @@ export const studentWeekIssueConverter = {
         return new StudentWeekIssue(
             data.id,
             data.weekId,
-            data.weekName,
             data.lateness,
             data.absence,
             data.attitude,

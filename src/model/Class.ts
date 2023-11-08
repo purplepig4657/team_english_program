@@ -7,7 +7,7 @@ import ClassWeekId from "./identifier/ClassWeekId";
 import StudentId from "./identifier/StudentId";
 
 export default class Class {
-    private _id: ClassId;
+    private readonly _id: ClassId;
     private _classWeekIdList: Array<ClassWeekId>;
     private _studentIdList: Array<StudentId>;
 
