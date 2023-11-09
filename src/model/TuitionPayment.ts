@@ -57,7 +57,7 @@ export const tuitionPaymentConverter: FirestoreDataConverter<TuitionPayment, Tui
     ): TuitionPayment => {
         const data = snapshot.data(options);
         return new TuitionPayment(
-            new TuitionPaymentId(data.id),
+            new TuitionPaymentId(snapshot.id),
             data.amount,
             data.paymentDate.toDate()
         );

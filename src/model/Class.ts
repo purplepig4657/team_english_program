@@ -45,7 +45,7 @@ interface ClassDBModel extends DocumentData {
     studentIdList: Array<string>;
 }
 
-export const classWeekConverter: FirestoreDataConverter<Class, ClassDBModel> = {
+export const classConverter: FirestoreDataConverter<Class, ClassDBModel> = {
     toFirestore: (classData: Class): ClassDBModel => {
         const classWeekIdStringList: Array<string> =
             classData.classWeekIdList.map((classWeekId: ClassWeekId) => classWeekId.id);
@@ -70,7 +70,7 @@ export const classWeekConverter: FirestoreDataConverter<Class, ClassDBModel> = {
             data.studentIdList.map((studentIdString: string) => new StudentId(studentIdString))
 
         return new Class(
-            new ClassId(data.id),
+            new ClassId(snapshot.id),
             classWeekIdList,
             studentIdList
         );

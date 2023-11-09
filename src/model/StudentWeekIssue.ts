@@ -78,7 +78,7 @@ export const studentWeekIssueConverter: FirestoreDataConverter<StudentWeekIssue,
     ): StudentWeekIssue => {
         const data = snapshot.data(options);
         return new StudentWeekIssue(
-            new StudentWeekIssueId(data.id),
+            new StudentWeekIssueId(snapshot.id),
             new WeekId(data.weekId),
             data.lateness,
             data.absence,

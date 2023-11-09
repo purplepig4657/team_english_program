@@ -22,7 +22,7 @@ const Dashboard = (): JSX.Element => {
             const data = await classWeekRepository.get(new ClassWeekId("6QVmSCsXmF2g2b7farEN"));
             console.log(data);
             console.log(await classWeekRepository.delete(new ClassWeekId("6QVmSCsXmF2g2b7farEN")));
-            console.log(await classWeekRepository.update(new ClassWeek(new ClassWeekId("8YkOzRQWfoWhqOp01Lq9"), new ClassWeekId("updated"), new Array<LectureId>())));
+            console.log(await classWeekRepository.update(new ClassWeek(new ClassWeekId("Qddr7cjEXsD1GgUTdXMk"), new ClassWeekId("asdfasdf"), new Array<LectureId>())));
             const data2 = await classWeekRepository.getAll();
             console.log(data2);
         })();

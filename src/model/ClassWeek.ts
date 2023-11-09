@@ -8,7 +8,6 @@ import {
 import ClassWeekId from "./identifier/ClassWeekId";
 import LectureId from "./identifier/LectureId";
 import WeekId from "./identifier/WeekId";
-import ClassId from "./identifier/ClassId";
 
 export default class ClassWeek {
     private readonly _id: ClassWeekId;
@@ -66,7 +65,7 @@ export const classWeekConverter: FirestoreDataConverter<ClassWeek, ClassWeekDBMo
         const lectureIdList: Array<LectureId> =
             data.lectureIdList.map((lectureIdString: string) => new LectureId(lectureIdString))
         return new ClassWeek(
-            new ClassId(data.id),
+            new ClassWeekId(snapshot.id),
             new WeekId(data.weekId),
             lectureIdList
         );

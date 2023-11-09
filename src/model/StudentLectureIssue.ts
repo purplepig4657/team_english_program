@@ -86,7 +86,7 @@ export const studentLectureIssueConverter: FirestoreDataConverter<StudentLecture
     ): StudentLectureIssue => {
         const data = snapshot.data(options);
         return new StudentLectureIssue(
-            new StudentLectureIssueId(data.id),
+            new StudentLectureIssueId(snapshot.id),
             new StudentId(data.studentId),
             data.lateness,
             data.absence,

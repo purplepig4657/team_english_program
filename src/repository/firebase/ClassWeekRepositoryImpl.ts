@@ -13,7 +13,7 @@ import WeekId from "../../model/identifier/WeekId";
 
 export default class ClassWeekRepositoryImpl implements ClassWeekRepository {
 
-    private COLLECTION_NAME = "class_week";
+    private COLLECTION_NAME = "class_weeks";
 
     async create(t: ClassWeek): Promise<ClassWeek> {
         const newClassWeekRef = doc(collection(db, this.COLLECTION_NAME)).withConverter(classWeekConverter);
@@ -45,30 +45,29 @@ export default class ClassWeekRepositoryImpl implements ClassWeekRepository {
 
     async update(t: ClassWeek): Promise<boolean> {
         const classWeekRef = doc(collection(db, this.COLLECTION_NAME), t.id).withConverter(classWeekConverter);
-        const lectureIdStringList: Array<string> = t.lectureIdList.map((lectureId: LectureId) => lectureId.id);
+        const updateModel = classWeekConverter.toFirestore(t);
         return updateDoc(classWeekRef, {
-            weekId: t.weekId.id,
-            lectureIdList: lectureIdStringList
-        }).then(() => { return true; }).catch(() => { return false });
+            ...updateModel
+        }).then(() => true).catch(() => false);
     }
 
     async delete(id: ClassWeekId): Promise<boolean> {
         const classWeekRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(classWeekConverter);
-        return deleteDoc(classWeekRef).then(() => { return true; }).catch(() => { return false; });
+        return deleteDoc(classWeekRef).then(() => true).catch(() => false);
     }
 
     pushLectureList(id: ClassWeekId, lectureId: LectureId): Promise<boolean> {
         const classWeekRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(classWeekConverter);
         return updateDoc(classWeekRef, {
             lectureIdList: arrayUnion(lectureId.id)
-        }).then(() => { return true; }).catch(() => { return false; });
+        }).then(() => true).catch(() => false);
     }
 
     removeLectureList(id: ClassWeekId, lectureId: LectureId): Promise<boolean> {
         const classWeekRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(classWeekConverter);
         return updateDoc(classWeekRef, {
             lectureIdList: arrayRemove(lectureId.id)
-        }).then(() => { return true; }).catch(() => { return false; });
+        }).then(() => true).catch(() => false);
     }
 
 }

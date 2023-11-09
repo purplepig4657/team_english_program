@@ -37,7 +37,7 @@ export default class Student {
         return this._id;
     }
 
-    get id(): String {
+    get id(): string {
         return this._id.id;
     }
 
@@ -91,7 +91,7 @@ export const studentConverter: FirestoreDataConverter<Student, StudentDBModel> =
         );
 
         return new Student(
-            new StudentId(data.id),
+            new StudentId(snapshot.id),
             classIdList,
             data.name,
             studentWeekIssueIdList,

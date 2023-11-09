@@ -73,7 +73,7 @@ export const lectureConverter: FirestoreDataConverter<Lecture, LectureDBModel> =
         );
 
         return new Lecture(
-            new LectureId(data.id),
+            new LectureId(snapshot.id),
             data.name,
             data.teacherName,
             studentLectureIssueIdList
