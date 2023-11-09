@@ -1,6 +1,9 @@
-import firebase from "firebase/compat";
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-import SnapshotOptions = firebase.firestore.SnapshotOptions;
+import {
+    DocumentData,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions
+} from "firebase/firestore";
 
 import WeekId from "./identifier/WeekId";
 
@@ -29,18 +32,24 @@ export default class Week {
 
 }
 
-export const weekConverter = {
-    toFirestore: (weekData: Week) => {
+interface WeekDBModel extends DocumentData {
+    name: string;
+}
+
+export const weekConverter: FirestoreDataConverter<Week, WeekDBModel> = {
+    toFirestore: (weekData: Week): WeekDBModel => {
         return {
-            id: weekData.id,
             name: weekData.name,
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    fromFirestore: (
+        snapshot: QueryDocumentSnapshot<WeekDBModel, WeekDBModel>,
+        options?: SnapshotOptions
+    ): Week => {
         const data = snapshot.data(options);
         return new Week(
-            data.id,
+            new WeekId(data.id),
             data.name
         );
-    }
-}
+    },
+};

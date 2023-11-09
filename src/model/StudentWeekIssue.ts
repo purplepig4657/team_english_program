@@ -1,6 +1,9 @@
-import firebase from "firebase/compat";
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-import SnapshotOptions = firebase.firestore.SnapshotOptions;
+import {
+    DocumentData,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions
+} from "firebase/firestore";
 
 import Issue from "./Issue";
 import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
@@ -43,11 +46,22 @@ export default class StudentWeekIssue extends Issue {
 
 }
 
-export const studentWeekIssueConverter = {
-    toFirestore: (studentWeekIssueData: StudentWeekIssue) => {
+interface StudentWeekIssueDBModel extends DocumentData {
+    weekId: string;
+    lateness: number;
+    absence: number;
+    attitude: number;
+    scoreIssue: number;
+    latenessComment: string | null;
+    absenceComment: string | null;
+    attitudeComment: string | null;
+    scoreIssueComment: string | null;
+}
+
+export const studentWeekIssueConverter: FirestoreDataConverter<StudentWeekIssue, StudentWeekIssueDBModel> = {
+    toFirestore: (studentWeekIssueData: StudentWeekIssue): StudentWeekIssueDBModel => {
         return {
-            id: studentWeekIssueData.id,
-            weekId: studentWeekIssueData.weekId,
+            weekId: studentWeekIssueData.weekId.id,
             lateness: studentWeekIssueData.lateness,
             absence: studentWeekIssueData.absence,
             attitude: studentWeekIssueData.attitude,
@@ -58,11 +72,14 @@ export const studentWeekIssueConverter = {
             scoreIssueComment: studentWeekIssueData.scoreIssueComment
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    fromFirestore: (
+        snapshot: QueryDocumentSnapshot<StudentWeekIssueDBModel, StudentWeekIssueDBModel>,
+        options?: SnapshotOptions
+    ): StudentWeekIssue => {
         const data = snapshot.data(options);
         return new StudentWeekIssue(
-            data.id,
-            data.weekId,
+            new StudentWeekIssueId(data.id),
+            new WeekId(data.weekId),
             data.lateness,
             data.absence,
             data.attitude,
@@ -72,5 +89,5 @@ export const studentWeekIssueConverter = {
             data.attitudeComment,
             data.scoreIssueComment
         );
-    }
-}
+    },
+};

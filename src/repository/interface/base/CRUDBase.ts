@@ -1,6 +1,6 @@
 export default interface CRUDBase<TYPE, ID> {
-    create(t: TYPE): TYPE;
-    get(id: ID): TYPE | null;
-    update(t: TYPE): TYPE;
-    delete(id: ID): boolean;
+    create(t: TYPE): Promise<TYPE>;
+    get(id: ID): Promise<TYPE | null>;
+    update(t: TYPE): Promise<boolean>;
+    delete(id: ID): Promise<boolean>;
 }

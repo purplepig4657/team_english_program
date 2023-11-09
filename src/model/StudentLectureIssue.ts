@@ -1,6 +1,9 @@
-import firebase from "firebase/compat";
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-import SnapshotOptions = firebase.firestore.SnapshotOptions;
+import {
+    DocumentData,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions
+} from "firebase/firestore";
 
 import Issue from "./Issue";
 import StudentId from "./identifier/StudentId";
@@ -51,11 +54,22 @@ export default class StudentLectureIssue extends Issue {
     }
 }
 
-export const studentLectureIssueConverter = {
-    toFirestore: (studentLectureIssueData: StudentLectureIssue) => {
+interface StudentLectureIssueDBModel extends DocumentData {
+    studentId: string;
+    lateness: number;
+    absence: number;
+    attitude: number;
+    scoreIssue: number;
+    latenessComment: string | null;
+    absenceComment: string | null;
+    attitudeComment: string | null;
+    scoreIssueComment: string | null;
+}
+
+export const studentLectureIssueConverter: FirestoreDataConverter<StudentLectureIssue, StudentLectureIssueDBModel> = {
+    toFirestore: (studentLectureIssueData: StudentLectureIssue): StudentLectureIssueDBModel => {
         return {
-            id: studentLectureIssueData.id,
-            studentId: studentLectureIssueData.studentId,
+            studentId: studentLectureIssueData.studentId.id,
             lateness: studentLectureIssueData.lateness,
             absence: studentLectureIssueData.absence,
             attitude: studentLectureIssueData.attitude,
@@ -66,11 +80,14 @@ export const studentLectureIssueConverter = {
             scoreIssueComment: studentLectureIssueData.scoreIssueComment
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    fromFirestore: (
+        snapshot: QueryDocumentSnapshot<StudentLectureIssueDBModel, StudentLectureIssueDBModel>,
+        options?: SnapshotOptions
+    ): StudentLectureIssue => {
         const data = snapshot.data(options);
         return new StudentLectureIssue(
-            data.id,
-            data.studentId,
+            new StudentLectureIssueId(data.id),
+            new StudentId(data.studentId),
             data.lateness,
             data.absence,
             data.attitude,
@@ -80,5 +97,5 @@ export const studentLectureIssueConverter = {
             data.attitudeComment,
             data.scoreIssueComment
         );
-    }
-}
+    },
+};

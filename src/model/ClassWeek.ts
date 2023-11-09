@@ -1,10 +1,14 @@
-import firebase from "firebase/compat";
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-import SnapshotOptions = firebase.firestore.SnapshotOptions;
+import {
+    QueryDocumentSnapshot,
+    SnapshotOptions,
+    FirestoreDataConverter,
+    DocumentData
+} from "firebase/firestore";
 
 import ClassWeekId from "./identifier/ClassWeekId";
 import LectureId from "./identifier/LectureId";
 import WeekId from "./identifier/WeekId";
+import ClassId from "./identifier/ClassId";
 
 export default class ClassWeek {
     private readonly _id: ClassWeekId;
@@ -40,16 +44,32 @@ export default class ClassWeek {
     }
 }
 
-export const classWeekConverter = {
-    toFirestore: (classWeekData: ClassWeek) => {
+interface ClassWeekDBModel extends DocumentData {
+    weekId: string,
+    lectureIdList: Array<string>
+}
+
+export const classWeekConverter: FirestoreDataConverter<ClassWeek, ClassWeekDBModel> = {
+    toFirestore: (classWeekData: ClassWeek): ClassWeekDBModel => {
+        const lectureIdStringList: Array<string> =
+            classWeekData.lectureIdList.map((lectureId: LectureId) => lectureId.id);
         return {
-            id: classWeekData.id,
-            weekId: classWeekData.weekId,
-            lectureIdList: classWeekData.lectureIdList
+            weekId: classWeekData.weekId.id,
+            lectureIdList: lectureIdStringList
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-        const data = snapshot.data(options);
-        return new ClassWeek(data.id, data.weekId, data.lectureIdList);
+    fromFirestore: (
+        snapshot: QueryDocumentSnapshot<ClassWeekDBModel, ClassWeekDBModel>,
+        options?: SnapshotOptions
+    ): ClassWeek => {
+        const data = snapshot.data(options) as ClassWeekDBModel;
+        const lectureIdList: Array<LectureId> =
+            data.lectureIdList.map((lectureIdString: string) => new LectureId(lectureIdString))
+        return new ClassWeek(
+            new ClassId(data.id),
+            new WeekId(data.weekId),
+            lectureIdList
+        );
     }
+
 }

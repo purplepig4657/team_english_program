@@ -1,6 +1,9 @@
-import firebase from "firebase/compat";
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-import SnapshotOptions = firebase.firestore.SnapshotOptions;
+import {
+    DocumentData,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions
+} from "firebase/firestore";
 
 import ClassId from "./identifier/ClassId";
 import StudentId from "./identifier/StudentId";
@@ -55,24 +58,44 @@ export default class Student {
     }
 }
 
-export const studentConverter = {
-    toFirestore: (studentData: Student) => {
+interface StudentDBModel extends DocumentData {
+    classIdList: Array<string>;
+    name: string;
+    studentWeekIssueIdList: Array<string>;
+    tuitionPaymentIdList: Array<string>;
+}
+
+export const studentConverter: FirestoreDataConverter<Student, StudentDBModel> = {
+    toFirestore: (student: Student): StudentDBModel => {
         return {
-            id: studentData.id,
-            classIdList: studentData.classIdList,
-            name: studentData.name,
-            studentWeekIssueIdList: studentData.studentWeekIssueIdList,
-            tuitionPaymentIdList: studentData.tuitionPaymentIdList,
+            classIdList: student.classIdList.map((classId: ClassId) => classId.id),
+            name: student.name,
+            studentWeekIssueIdList:
+                student.studentWeekIssueIdList.map((studentWeekIssueId: StudentWeekIssueId) => studentWeekIssueId.id),
+            tuitionPaymentIdList:
+                student.tuitionPaymentIdList.map((tuitionPaymentId: TuitionPaymentId) => tuitionPaymentId.id),
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-        const data = snapshot.data(options);
-        return new Student(
-            data.id,
-            data.classIdList,
-            data.name,
-            data.studentWeekIssueIdList,
-            data.tuitionPaymentIdList
+    fromFirestore: (
+        snapshot: QueryDocumentSnapshot<StudentDBModel, StudentDBModel>,
+        options?: SnapshotOptions
+    ): Student => {
+        const data = snapshot.data(options) as StudentDBModel;
+
+        const classIdList: Array<ClassId> = data.classIdList.map((classIdString: string) => new ClassId(classIdString));
+        const studentWeekIssueIdList: Array<StudentWeekIssueId> = data.studentWeekIssueIdList.map(
+            (studentWeekIssueIdString: string) => new StudentWeekIssueId(studentWeekIssueIdString)
         );
-    }
-}
+        const tuitionPaymentIdList: Array<TuitionPaymentId> = data.tuitionPaymentIdList.map(
+            (tuitionPaymentIdString: string) => new TuitionPaymentId(tuitionPaymentIdString)
+        );
+
+        return new Student(
+            new StudentId(data.id),
+            classIdList,
+            data.name,
+            studentWeekIssueIdList,
+            tuitionPaymentIdList
+        );
+    },
+};

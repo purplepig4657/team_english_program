@@ -1,6 +1,9 @@
-import firebase from "firebase/compat";
-import QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-import SnapshotOptions = firebase.firestore.SnapshotOptions;
+import {
+    DocumentData,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions
+} from "firebase/firestore";
 
 import LectureId from "./identifier/LectureId";
 import StudentLectureIssueId from "./identifier/StudentLectureIssueId";
@@ -41,22 +44,39 @@ export default class Lecture {
     }
 }
 
-export const lectureConverter = {
-    toFirestore: (lectureData: Lecture) => {
+interface LectureDBModel extends DocumentData {
+    name: string;
+    teacherName: string;
+    studentLectureIssueIdList: Array<string>;
+}
+
+export const lectureConverter: FirestoreDataConverter<Lecture, LectureDBModel> = {
+    toFirestore: (lecture: Lecture): LectureDBModel => {
+        const studentLectureIssueIdStringList: Array<string> = lecture.studentLectureIssueIdList.map(
+            (studentLectureIssueId: StudentLectureIssueId) => studentLectureIssueId.id
+        );
+
         return {
-            id: lectureData.id,
-            name: lectureData.name,
-            teacherName: lectureData.teacherName,
-            studentLectureIssueIdList: lectureData.studentLectureIssueIdList,
+            name: lecture.name,
+            teacherName: lecture.teacherName,
+            studentLectureIssueIdList: studentLectureIssueIdStringList,
         };
     },
-    fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-        const data = snapshot.data(options);
+    fromFirestore: (
+        snapshot: QueryDocumentSnapshot<LectureDBModel, LectureDBModel>,
+        options?: SnapshotOptions
+    ): Lecture => {
+        const data = snapshot.data(options) as LectureDBModel;
+
+        const studentLectureIssueIdList: Array<StudentLectureIssueId> = data.studentLectureIssueIdList.map(
+            (studentLectureIssueIdString: string) => new StudentLectureIssueId(studentLectureIssueIdString)
+        );
+
         return new Lecture(
-            data.id,
+            new LectureId(data.id),
             data.name,
             data.teacherName,
-            data.studentLectureIssueIdList
+            studentLectureIssueIdList
         );
-    }
-}
+    },
+};
