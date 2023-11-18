@@ -1,6 +1,6 @@
 import {
-    doc, getDoc, getDocs, updateDoc, deleteDoc, collection, setDoc,
-    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot
+    doc, getDoc, getDocs, updateDoc, collection,
+    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot, query, orderBy, DocumentReference
 } from "firebase/firestore";
 
 import { db } from "../../config/firebaseConfig";
@@ -8,49 +8,39 @@ import { db } from "../../config/firebaseConfig";
 import TuitionPaymentRepository from "../interface/TuitionPaymentRepository";
 import TuitionPayment, { tuitionPaymentConverter } from "../../model/TuitionPayment";
 import TuitionPaymentId from "../../model/identifier/TuitionPaymentId";
+import StudentId from "../../model/identifier/StudentId";
+import {STUDENT_COLLECTION_NAME, TUITION_PAYMENT_COLLECTION_NAME} from "../common/firebaseCollectionNames";
 
 export default class TuitionPaymentRepositoryImpl implements TuitionPaymentRepository {
 
-    private COLLECTION_NAME = "tuition_payments";
-
-    async create(t: TuitionPayment): Promise<TuitionPayment> {
-        const newPaymentRef = doc(collection(db, this.COLLECTION_NAME)).withConverter(tuitionPaymentConverter);
-        const newPaymentId: string = newPaymentRef.id;
-        const newPayment = new TuitionPayment(
-            new TuitionPaymentId(newPaymentId),
-            t.amount,
-            t.paymentDate
-        );
-        await setDoc(newPaymentRef, newPayment);
-        return newPayment;
-    }
-
-    async get(id: TuitionPaymentId): Promise<TuitionPayment | null> {
-        const paymentRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(tuitionPaymentConverter);
-        const paymentSnap: DocumentSnapshot<TuitionPayment> = await getDoc(paymentRef);
-        if (paymentSnap.exists()) return paymentSnap.data();
+    async get(id: StudentId | DocumentReference, tuitionPaymentId: TuitionPaymentId): Promise<TuitionPayment | null> {
+        const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION_NAME), id.id) : id;
+        const tuitionPaymentRef = doc(collection(studentRef, TUITION_PAYMENT_COLLECTION_NAME), tuitionPaymentId.id)
+            .withConverter(tuitionPaymentConverter);
+        const tuitionPaymentSnap: DocumentSnapshot<TuitionPayment> = await getDoc(tuitionPaymentRef);
+        if (tuitionPaymentSnap.exists()) return tuitionPaymentSnap.data();
         else return null;
     }
 
-    async getAll(): Promise<Array<TuitionPayment>> {
-        const paymentListSnap: QuerySnapshot = await getDocs(collection(db, this.COLLECTION_NAME));
+    async getAll(id: StudentId | DocumentReference): Promise<Array<TuitionPayment>> {
+        const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION_NAME), id.id) : id;
+        const tuitionPaymentRef = collection(studentRef, TUITION_PAYMENT_COLLECTION_NAME);
+        const q = query(tuitionPaymentRef, orderBy("paymentDate"));
+        const tuitionPaymentListSnap: QuerySnapshot = await getDocs(q);
         const result: Array<TuitionPayment> = new Array<TuitionPayment>();
-        paymentListSnap.forEach((paymentDBModel: QueryDocumentSnapshot) => {
-            result.push(tuitionPaymentConverter.fromFirestore(paymentDBModel));
+        tuitionPaymentListSnap.forEach((tuitionPaymentDBModel: QueryDocumentSnapshot) => {
+            result.push(tuitionPaymentConverter.fromFirestore(tuitionPaymentDBModel));
         });
         return result;
     }
 
-    async update(t: TuitionPayment): Promise<boolean> {
-        const paymentRef = doc(collection(db, this.COLLECTION_NAME), t.id).withConverter(tuitionPaymentConverter);
-        const updateModel = tuitionPaymentConverter.toFirestore(t);
-        return updateDoc(paymentRef, {
+    async update(id: StudentId | DocumentReference, tuitionPayment: TuitionPayment): Promise<boolean> {
+        const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION_NAME), id.id) : id;
+        const tuitionPaymentRef = doc(collection(studentRef, TUITION_PAYMENT_COLLECTION_NAME), tuitionPayment.idString);
+        const updateModel = tuitionPaymentConverter.toFirestore(tuitionPayment);
+        return updateDoc(tuitionPaymentRef, {
             ...updateModel
         }).then(() => true).catch(() => false);
     }
 
-    async delete(id: TuitionPaymentId): Promise<boolean> {
-        const paymentRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(tuitionPaymentConverter);
-        return deleteDoc(paymentRef).then(() => true).catch(() => false);
-    }
 }

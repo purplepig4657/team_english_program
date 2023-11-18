@@ -4,14 +4,16 @@ import StudentId from "../../model/identifier/StudentId";
 import ClassId from "../../model/identifier/ClassId";
 import StudentWeekIssueId from "../../model/identifier/StudentWeekIssueId";
 import TuitionPaymentId from "../../model/identifier/TuitionPaymentId";
+import StudentWeekIssue from "../../model/StudentWeekIssue";
+import TuitionPayment from "../../model/TuitionPayment";
 
 export default interface StudentRepository extends CRUDBase<Student, StudentId> {
     getAll(): Promise<Array<Student>>;
-    pushClassList(id: StudentId, classId: ClassId): Promise<boolean>;
-    removeClassList(id: StudentId, classId: ClassId): Promise<boolean>;
-    pushStudentWeekIssueList(id: StudentId, studentWeekIssueId: StudentWeekIssueId): Promise<boolean>;
-    removeStudentWeekIssueList(id: StudentId, studentWeekIssueId: StudentWeekIssueId): Promise<boolean>;
-    pushTuitionPaymentList(id: StudentId, tuitionPaymentId: TuitionPaymentId): Promise<boolean>;
-    removeTuitionPaymentList(id: StudentId, tuitionPaymentId: TuitionPaymentId): Promise<boolean>;
+    addClassId(id: StudentId, classId: ClassId): Promise<boolean>;
+    removeClassId(id: StudentId, classId: ClassId): Promise<boolean>;
+    addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<boolean>;
+    removeStudentWeekIssue(id: StudentId, studentWeekIssueId: StudentWeekIssueId): Promise<boolean>;
+    addTuitionPayment(id: StudentId, tuitionPayment: TuitionPayment): Promise<boolean>;
+    removeTuitionPayment(id: StudentId, tuitionPaymentId: TuitionPaymentId): Promise<boolean>;
 
 }

@@ -1,5 +1,5 @@
 import {
-    doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, arrayUnion, arrayRemove, collection,
+    doc, getDoc, getDocs, updateDoc, collection,
     QueryDocumentSnapshot, DocumentSnapshot, QuerySnapshot
 } from "firebase/firestore";
 
@@ -8,34 +8,23 @@ import { db } from "../../config/firebaseConfig";
 import LectureRepository from "../interface/LectureRepository";
 import Lecture, { lectureConverter } from "../../model/Lecture";
 import LectureId from "../../model/identifier/LectureId";
-import StudentLectureIssueId from "../../model/identifier/StudentLectureIssueId";
+import ClassId from "../../model/identifier/ClassId";
+import {CLASS_COLLECTION_NAME, LECTURE_COLLECTION_NAME} from "../common/firebaseCollectionNames";
 
 export default class LectureRepositoryImpl implements LectureRepository {
 
-    private COLLECTION_NAME = "lectures";
-
-    async create(t: Lecture): Promise<Lecture> {
-        const newLectureRef = doc(collection(db, this.COLLECTION_NAME)).withConverter(lectureConverter);
-        const newLectureId: string = newLectureRef.id;
-        const newLecture = new Lecture(
-            new LectureId(newLectureId),
-            t.name,
-            t.teacherName,
-            t.studentLectureIssueIdList
-        );
-        await setDoc(newLectureRef, newLecture);
-        return newLecture;
-    }
-
-    async get(id: LectureId): Promise<Lecture | null> {
-        const lectureRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(lectureConverter);
+    async get(classId: ClassId, lectureId: LectureId): Promise<Lecture | null> {
+        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
+        const lectureRef = doc(collection(classRef, LECTURE_COLLECTION_NAME), lectureId.id).withConverter(lectureConverter);
         const lectureSnap: DocumentSnapshot<Lecture> = await getDoc(lectureRef);
         if (lectureSnap.exists()) return lectureSnap.data();
         else return null;
     }
 
-    async getAll(): Promise<Array<Lecture>> {
-        const lectureListSnap: QuerySnapshot = await getDocs(collection(db, this.COLLECTION_NAME));
+    async getAll(classId: ClassId): Promise<Array<Lecture>> {
+        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
+        const lectureListSnap: QuerySnapshot =
+            await getDocs(collection(classRef, LECTURE_COLLECTION_NAME));
         const result: Array<Lecture> = new Array<Lecture>();
         lectureListSnap.forEach((lectureDBModel: QueryDocumentSnapshot) => {
             result.push(lectureConverter.fromFirestore(lectureDBModel));
@@ -43,30 +32,13 @@ export default class LectureRepositoryImpl implements LectureRepository {
         return result;
     }
 
-    async update(t: Lecture): Promise<boolean> {
-        const lectureRef = doc(collection(db, this.COLLECTION_NAME), t.id).withConverter(lectureConverter);
-        const updateModel = lectureConverter.toFirestore(t);
+    async update(classId: ClassId, lecture: Lecture): Promise<boolean> {
+        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
+        const lectureRef = doc(collection(classRef, LECTURE_COLLECTION_NAME), lecture.idString);
+        const updateModel = lectureConverter.toFirestore(lecture);
         return updateDoc(lectureRef, {
             ...updateModel
         }).then(() => true).catch(() => false);
     }
 
-    async delete(id: LectureId): Promise<boolean> {
-        const lectureRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(lectureConverter);
-        return deleteDoc(lectureRef).then(() => true).catch(() => false);
-    }
-
-    async pushStudentLectureIssueList(id: LectureId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean> {
-        const lectureRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(lectureConverter);
-        return updateDoc(lectureRef, {
-            studentLectureIssueIdList: arrayUnion(studentLectureIssueId.id),
-        }).then(() => true).catch(() => false);
-    }
-
-    async removeStudentLectureIssueList(id: LectureId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean> {
-        const lectureRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(lectureConverter);
-        return updateDoc(lectureRef, {
-            studentLectureIssueIdList: arrayRemove(studentLectureIssueId.id),
-        }).then(() => true).catch(() => false);
-    }
 }

@@ -1,14 +1,20 @@
 import Class from "../../model/Class";
 import ClassId from "../../model/identifier/ClassId";
 import CRUDBase from "./base/CRUDBase";
-import ClassWeekId from "../../model/identifier/ClassWeekId";
 import StudentId from "../../model/identifier/StudentId";
+import StudentLectureIssue from "../../model/StudentLectureIssue";
+import StudentLectureIssueId from "../../model/identifier/StudentLectureIssueId";
+import Lecture from "../../model/Lecture";
+import LectureId from "../../model/identifier/LectureId";
 
 export default interface ClassRepository extends CRUDBase<Class, ClassId> {
     getAll(): Promise<Array<Class>>;
-    pushClassWeekList(id: ClassId, classWeekId: ClassWeekId): Promise<boolean>;
-    removeClassWeekList(id: ClassId, classWeekId: ClassWeekId): Promise<boolean>;
-    pushStudentList(id: ClassId, studentId: StudentId): Promise<boolean>;
-    removeStudentList(id: ClassId, studentId: StudentId): Promise<boolean>;
+    addStudentId(id: ClassId, studentId: StudentId): Promise<boolean>;
+    removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean>;
+    addStudentLectureIssue(id: ClassId, studentLectureIssue: StudentLectureIssue): Promise<boolean>;
+    removeStudentLectureIssue(id: ClassId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean>;
+    addLecture(id: ClassId, lecture: Lecture): Promise<boolean>;
+    removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean>;
+
 
 }

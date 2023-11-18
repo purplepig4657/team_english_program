@@ -5,71 +5,92 @@ import {
     SnapshotOptions
 } from "firebase/firestore";
 
-import Issue from "./Issue";
 import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
 import WeekId from "./identifier/WeekId";
+import StudentId from "./identifier/StudentId";
 
-export default class StudentWeekIssue extends Issue {
-    private readonly _id: StudentWeekIssueId;
+
+export default class StudentWeekIssue {
+    private readonly _id: StudentWeekIssueId;  // same with week name.
+    private readonly _studentId: StudentId  // foreign key
     private readonly _weekId: WeekId;
+    private _lateness: number;
+    private _absence: number;
+    private _attitude: number;
+    private _scoreIssue: number;
 
     constructor(
         id: StudentWeekIssueId,
+        studentId: StudentId,
         weekId: WeekId,
         lateness: number,
         absence: number,
         attitude: number,
         scoreIssue: number,
-        latenessComment: string | null,
-        absenceComment: string | null,
-        attitudeComment: string | null,
-        scoreIssueComment: string | null
     ) {
-        super(lateness, absence, attitude, scoreIssue, latenessComment, absenceComment, attitudeComment, scoreIssueComment);
         this._id = id;
+        this._studentId = studentId;
         this._weekId = weekId;
+        this._lateness = lateness;
+        this._absence = absence;
+        this._attitude = attitude;
+        this._scoreIssue = scoreIssue;
     }
 
     // Getter
 
-    get idObject(): StudentWeekIssueId {
+    get id(): StudentWeekIssueId {
         return this._id;
     }
 
-    get id(): string {
+    get idString(): string {
         return this._id.id;
+    }
+
+    get studentId(): StudentId {
+        return this._studentId;
     }
 
     get weekId(): WeekId {
         return this._weekId;
     }
 
+    get lateness(): number {
+        return this._lateness;
+    }
+
+    get absence(): number {
+        return this._absence;
+    }
+
+    get attitude(): number {
+        return this._attitude;
+    }
+
+    get scoreIssue(): number {
+        return this._scoreIssue;
+    }
 }
 
+
 interface StudentWeekIssueDBModel extends DocumentData {
+    studentId: string;
     weekId: string;
     lateness: number;
     absence: number;
     attitude: number;
     scoreIssue: number;
-    latenessComment: string | null;
-    absenceComment: string | null;
-    attitudeComment: string | null;
-    scoreIssueComment: string | null;
 }
 
 export const studentWeekIssueConverter: FirestoreDataConverter<StudentWeekIssue, StudentWeekIssueDBModel> = {
     toFirestore: (studentWeekIssueData: StudentWeekIssue): StudentWeekIssueDBModel => {
         return {
+            studentId: studentWeekIssueData.studentId.id,
             weekId: studentWeekIssueData.weekId.id,
             lateness: studentWeekIssueData.lateness,
             absence: studentWeekIssueData.absence,
             attitude: studentWeekIssueData.attitude,
-            scoreIssue: studentWeekIssueData.scoreIssue,
-            latenessComment: studentWeekIssueData.latenessComment,
-            absenceComment: studentWeekIssueData.absenceComment,
-            attitudeComment: studentWeekIssueData.attitudeComment,
-            scoreIssueComment: studentWeekIssueData.scoreIssueComment
+            scoreIssue: studentWeekIssueData.scoreIssue
         };
     },
     fromFirestore: (
@@ -79,15 +100,12 @@ export const studentWeekIssueConverter: FirestoreDataConverter<StudentWeekIssue,
         const data = snapshot.data(options);
         return new StudentWeekIssue(
             new StudentWeekIssueId(snapshot.id),
+            new StudentId(data.studentId),
             new WeekId(data.weekId),
             data.lateness,
             data.absence,
             data.attitude,
-            data.scoreIssue,
-            data.latenessComment,
-            data.absenceComment,
-            data.attitudeComment,
-            data.scoreIssueComment
+            data.scoreIssue
         );
     },
 };

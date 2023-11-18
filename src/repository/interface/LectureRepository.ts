@@ -1,11 +1,10 @@
-import CRUDBase from "./base/CRUDBase";
 import Lecture from "../../model/Lecture";
+import ClassId from "../../model/identifier/ClassId";
 import LectureId from "../../model/identifier/LectureId";
-import StudentLectureIssueId from "../../model/identifier/StudentLectureIssueId";
 
-export default interface LectureRepository extends CRUDBase<Lecture, LectureId>{
-    getAll(): Promise<Array<Lecture>>;
-    pushStudentLectureIssueList(id: LectureId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean>;
-    removeStudentLectureIssueList(id: LectureId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean>;
+export default interface LectureRepository {
+    get(classId: ClassId, lectureId: LectureId): Promise<Lecture | null>;
+    getAll(classId: ClassId): Promise<Array<Lecture>>;
+    update(classId: ClassId, lecture: Lecture): Promise<boolean>;
 
 }

@@ -1,63 +1,45 @@
 import {
-    doc, getDoc, getDocs, updateDoc, deleteDoc, collection, setDoc,
-    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot
+    doc, getDoc, getDocs, updateDoc, collection,
+    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot, DocumentReference
 } from "firebase/firestore";
 
-import { db } from "../../config/firebaseConfig";
+import {db} from "../../config/firebaseConfig";
 
 import StudentWeekIssueRepository from "../interface/StudentWeekIssueRepository";
-import StudentWeekIssue, { studentWeekIssueConverter } from "../../model/StudentWeekIssue";
+import StudentWeekIssue, {studentWeekIssueConverter} from "../../model/StudentWeekIssue";
 import StudentWeekIssueId from "../../model/identifier/StudentWeekIssueId";
+import StudentId from "../../model/identifier/StudentId";
+import { STUDENT_COLLECTION_NAME, STUDENT_WEEK_ISSUE_COLLECTION_NAME } from "../common/firebaseCollectionNames";
 
 export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueRepository {
 
-    private COLLECTION_NAME = "student_week_issues";
-
-    async create(t: StudentWeekIssue): Promise<StudentWeekIssue> {
-        const newIssueRef = doc(collection(db, this.COLLECTION_NAME)).withConverter(studentWeekIssueConverter);
-        const newIssueId: string = newIssueRef.id;
-        const newIssue = new StudentWeekIssue(
-            new StudentWeekIssueId(newIssueId),
-            t.weekId,
-            t.lateness,
-            t.absence,
-            t.attitude,
-            t.scoreIssue,
-            t.latenessComment,
-            t.absenceComment,
-            t.attitudeComment,
-            t.scoreIssueComment
-        );
-        await setDoc(newIssueRef, newIssue);
-        return newIssue;
-    }
-
-    async get(id: StudentWeekIssueId): Promise<StudentWeekIssue | null> {
-        const issueRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(studentWeekIssueConverter);
-        const issueSnap: DocumentSnapshot<StudentWeekIssue> = await getDoc(issueRef);
-        if (issueSnap.exists()) return issueSnap.data();
+    async get(id: StudentId | DocumentReference, studentWeekIssueId: StudentWeekIssueId): Promise<StudentWeekIssue | null> {
+        const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION_NAME), id.id) : id;
+        const studentWeekIssueRef = doc(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION_NAME), studentWeekIssueId.id)
+            .withConverter(studentWeekIssueConverter);
+        const studentWeekIssueSnap: DocumentSnapshot<StudentWeekIssue> = await getDoc(studentWeekIssueRef);
+        if (studentWeekIssueSnap.exists()) return studentWeekIssueSnap.data();
         else return null;
     }
 
-    async getAll(): Promise<Array<StudentWeekIssue>> {
-        const issueListSnap: QuerySnapshot = await getDocs(collection(db, this.COLLECTION_NAME));
+    async getAll(id: StudentId | DocumentReference): Promise<Array<StudentWeekIssue>> {
+        const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION_NAME), id.id) : id;
+        const studentWeekIssueListSnap: QuerySnapshot =
+            await getDocs(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION_NAME));
         const result: Array<StudentWeekIssue> = new Array<StudentWeekIssue>();
-        issueListSnap.forEach((issueDBModel: QueryDocumentSnapshot) => {
-            result.push(studentWeekIssueConverter.fromFirestore(issueDBModel));
+        studentWeekIssueListSnap.forEach((studentWeekIssueDBModel: QueryDocumentSnapshot) => {
+            result.push(studentWeekIssueConverter.fromFirestore(studentWeekIssueDBModel));
         });
         return result;
     }
 
-    async update(t: StudentWeekIssue): Promise<boolean> {
-        const issueRef = doc(collection(db, this.COLLECTION_NAME), t.id).withConverter(studentWeekIssueConverter);
-        const updateModel = studentWeekIssueConverter.toFirestore(t);
-        return updateDoc(issueRef, {
+    async update(id: StudentId | DocumentReference, studentWeekIssue: StudentWeekIssue): Promise<boolean> {
+        const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION_NAME), id.id) : id;
+        const studentWeekIssueRef = doc(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION_NAME), studentWeekIssue.idString);
+        const updateModel = studentWeekIssueConverter.toFirestore(studentWeekIssue);
+        return updateDoc(studentWeekIssueRef, {
             ...updateModel
         }).then(() => true).catch(() => false);
     }
 
-    async delete(id: StudentWeekIssueId): Promise<boolean> {
-        const issueRef = doc(collection(db, this.COLLECTION_NAME), id.id).withConverter(studentWeekIssueConverter);
-        return deleteDoc(issueRef).then(() => true).catch(() => false);
-    }
 }

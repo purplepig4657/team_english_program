@@ -6,29 +6,47 @@ import {
 } from "firebase/firestore";
 
 import LectureId from "./identifier/LectureId";
-import StudentLectureIssueId from "./identifier/StudentLectureIssueId";
+import WeekId from "./identifier/WeekId";
+import ClassId from "./identifier/ClassId";
+import StudentLectureIssue from "./StudentLectureIssue";
 
 export default class Lecture {
     private readonly _id: LectureId;
+    private readonly _classId: ClassId;  // foreign key
+    private readonly _weekId: WeekId;
     private _name: string;
     private _teacherName: string;
-    private _studentLectureIssueIdList: Array<StudentLectureIssueId>;
 
-    constructor(id: LectureId, name: string, teacherName: string, studentLectureIssueIdList: Array<StudentLectureIssueId>) {
+    constructor(
+        id: LectureId,
+        classId: ClassId,
+        weekId: WeekId,
+        name: string,
+        teacherName: string
+    ) {
         this._id = id;
+        this._classId = classId;
+        this._weekId = weekId;
         this._name = name;
         this._teacherName = teacherName;
-        this._studentLectureIssueIdList = studentLectureIssueIdList;
     }
 
     // Getter
 
-    get idObject(): LectureId {
+    get id(): LectureId {
         return this._id;
     }
 
-    get id(): string {
+    get idString(): string {
         return this._id.id;
+    }
+
+    get classId(): ClassId {
+        return this._classId;
+    }
+
+    get weekId(): WeekId {
+        return this._weekId;
     }
 
     get name(): string {
@@ -39,27 +57,25 @@ export default class Lecture {
         return this._teacherName;
     }
 
-    get studentLectureIssueIdList(): Array<StudentLectureIssueId> {
-        return this._studentLectureIssueIdList;
-    }
 }
 
 interface LectureDBModel extends DocumentData {
+    classId: string;
+    weekId: string;
     name: string;
     teacherName: string;
-    studentLectureIssueIdList: Array<string>;
 }
 
 export const lectureConverter: FirestoreDataConverter<Lecture, LectureDBModel> = {
     toFirestore: (lecture: Lecture): LectureDBModel => {
-        const studentLectureIssueIdStringList: Array<string> = lecture.studentLectureIssueIdList.map(
-            (studentLectureIssueId: StudentLectureIssueId) => studentLectureIssueId.id
-        );
+
 
         return {
+            classId: lecture.classId.id,
+            weekId: lecture.weekId.id,
             name: lecture.name,
             teacherName: lecture.teacherName,
-            studentLectureIssueIdList: studentLectureIssueIdStringList,
+
         };
     },
     fromFirestore: (
@@ -68,15 +84,12 @@ export const lectureConverter: FirestoreDataConverter<Lecture, LectureDBModel> =
     ): Lecture => {
         const data = snapshot.data(options) as LectureDBModel;
 
-        const studentLectureIssueIdList: Array<StudentLectureIssueId> = data.studentLectureIssueIdList.map(
-            (studentLectureIssueIdString: string) => new StudentLectureIssueId(studentLectureIssueIdString)
-        );
-
         return new Lecture(
             new LectureId(snapshot.id),
+            new ClassId(data.classId),
+            new WeekId(data.weekId),
             data.name,
-            data.teacherName,
-            studentLectureIssueIdList
+            data.teacherName
         );
     },
 };
