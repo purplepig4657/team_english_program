@@ -2,29 +2,35 @@ import React, {useEffect} from "react";
 import Scaffold from "../../components/Scaffold";
 import { Typography } from "@mui/material";
 import FlexContainer from "../../components/FlexContainer";
-import ClassWeekRepositoryImpl from "../../repository/firebase/ClassWeekRepositoryImpl";
-import ClassWeekRepository from "../../repository/interface/ClassWeekRepository";
-import ClassWeekId from "../../model/identifier/ClassWeekId";
-import LectureId from "../../model/identifier/LectureId";
-import ClassWeek from "../../model/ClassWeek";
+import StudentService from "../../service/StudentService";
+import Student from "../../model/Student";
+import StudentId from "../../model/identifier/StudentId";
+import ClassId from "../../model/identifier/ClassId";
 
 const Dashboard = (): JSX.Element => {
     useEffect(() => {
-        // (async () => {
-        //     const classWeekRepository: ClassWeekRepository = new ClassWeekRepositoryImpl();
-        //     const data = await classWeekRepository.create(
-        //         new ClassWeek(new ClassWeekId("asdf"), new ClassWeekId("asdf"), new Array<LectureId>())
-        //     );
-        //     console.log(data);
-        // })();
         (async () => {
-            const classWeekRepository: ClassWeekRepository = new ClassWeekRepositoryImpl();
-            const data = await classWeekRepository.get(new ClassWeekId("6QVmSCsXmF2g2b7farEN"));
-            console.log(data);
-            console.log(await classWeekRepository.delete(new ClassWeekId("6QVmSCsXmF2g2b7farEN")));
-            console.log(await classWeekRepository.update(new ClassWeek(new ClassWeekId("Qddr7cjEXsD1GgUTdXMk"), new ClassWeekId("asdfasdf"), new Array<LectureId>())));
-            const data2 = await classWeekRepository.getAll();
-            console.log(data2);
+            const studentService = StudentService.getInstance();
+            // const student = studentService.createStudent(new Student(
+            //     new StudentId("none"),
+            //     [new ClassId("class1")],
+            //     "Hello")
+            // );
+            studentService.updateStudent(new Student(
+                new StudentId("6s2S62Kw4w0cvsVdx5mx"),
+                [new ClassId("class1"), new ClassId("class2")],
+                "updated"
+            ));
+            // studentService.addStudentWeekIssue(
+            //     new StudentId("6s2S62Kw4w0cvsVdx5mx"),
+            //     new StudentWeekIssue(
+            //         new StudentWeekIssueId("none"),
+            //         new StudentId("6s2S62Kw4w0cvsVdx5mx"),
+            //         WeekId.thisWeek(),
+            //         0, 0, 0, 0
+            //     )
+            // );
+            // console.log(student);
         })();
     }, []);
 

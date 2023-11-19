@@ -14,15 +14,15 @@ import LectureId from "../../model/identifier/LectureId";
 import StudentLectureIssue, {studentLectureIssueConverter} from "../../model/StudentLectureIssue";
 import StudentLectureIssueId from "../../model/identifier/StudentLectureIssueId";
 import {
-    CLASS_COLLECTION_NAME,
-    LECTURE_COLLECTION_NAME,
-    STUDENT_LECTURE_ISSUE_COLLECTION_NAME
+    CLASS_COLLECTION,
+    LECTURE_COLLECTION,
+    STUDENT_LECTURE_ISSUE_COLLECTION
 } from "../common/firebaseCollectionNames";
 
 export default class ClassRepositoryImpl implements ClassRepository {
 
     async create(t: Class): Promise<Class> {
-        const newClassRef = doc(collection(db, CLASS_COLLECTION_NAME)).withConverter(classConverter);
+        const newClassRef = doc(collection(db, CLASS_COLLECTION)).withConverter(classConverter);
         const newClassId: ClassId = new ClassId(newClassRef.id);
         const newClass: Class = new Class(
             newClassId,
@@ -33,14 +33,14 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     async get(id: ClassId): Promise<Class | null> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id).withConverter(classConverter);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
         const classSnap: DocumentSnapshot<Class> = await getDoc(classRef);
         if (classSnap.exists()) return classSnap.data();
         else return null;
     }
 
     async getAll(): Promise<Array<Class>> {
-        const classListSnap: QuerySnapshot = await getDocs(collection(db, CLASS_COLLECTION_NAME));
+        const classListSnap: QuerySnapshot = await getDocs(collection(db, CLASS_COLLECTION));
         const result: Array<Class> = new Array<Class>();
         classListSnap.forEach((classDBModel: QueryDocumentSnapshot) => {
             result.push(classConverter.fromFirestore(classDBModel));
@@ -49,7 +49,7 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     async update(t: Class): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), t.idString).withConverter(classConverter);
+        const classRef = doc(collection(db, CLASS_COLLECTION), t.idString).withConverter(classConverter);
         const updateModel = classConverter.toFirestore(t);
         return updateDoc(classRef, {
             ...updateModel
@@ -57,27 +57,27 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     async delete(id: ClassId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id).withConverter(classConverter);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
         return deleteDoc(classRef).then(() => true).catch(() => false);
     }
 
     async addStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id).withConverter(classConverter);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
         return updateDoc(classRef, {
             studentIdList: arrayUnion(studentId.id)
         }).then(() => true).catch(() => false);
     }
 
     async removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id).withConverter(classConverter);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
         return updateDoc(classRef, {
             studentIdList: arrayRemove(studentId.id)
         }).then(() => true).catch(() => false);
     }
 
     addLecture(id: ClassId, lecture: Lecture): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id);
-        const lectureRef = doc(collection(classRef, LECTURE_COLLECTION_NAME)).withConverter(lectureConverter);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
+        const lectureRef = doc(collection(classRef, LECTURE_COLLECTION)).withConverter(lectureConverter);
         const newLecture = new Lecture(
             new LectureId(lectureRef.id),
             lecture.classId,
@@ -89,14 +89,14 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id);
-        const lectureRef = doc(collection(classRef, LECTURE_COLLECTION_NAME), lectureId.id);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
+        const lectureRef = doc(collection(classRef, LECTURE_COLLECTION), lectureId.id);
         return deleteDoc(lectureRef).then(() => true).catch(() => false);
     }
 
     addStudentLectureIssue(id: ClassId, studentLectureIssue: StudentLectureIssue): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id);
-        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION_NAME))
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
+        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION))
             .withConverter(studentLectureIssueConverter);
         const newStudentLectureIssue = new StudentLectureIssue(
             new StudentLectureIssueId(studentLectureIssueRef.id),
@@ -116,8 +116,8 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     removeStudentLectureIssue(id: ClassId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), id.id);
-        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION_NAME), studentLectureIssueId.id);
+        const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
+        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION), studentLectureIssueId.id);
         return deleteDoc(studentLectureIssueRef).then(() => true).catch(() => false);
     }
 }

@@ -10,16 +10,16 @@ import StudentLectureIssue, { studentLectureIssueConverter } from "../../model/S
 import StudentLectureIssueId from "../../model/identifier/StudentLectureIssueId";
 import ClassId from "../../model/identifier/ClassId";
 import {
-    CLASS_COLLECTION_NAME,
-    STUDENT_LECTURE_ISSUE_COLLECTION_NAME
+    CLASS_COLLECTION,
+    STUDENT_LECTURE_ISSUE_COLLECTION
 } from "../common/firebaseCollectionNames";
 import LectureId from "../../model/identifier/LectureId";
 
 export default class StudentLectureIssueRepositoryImpl implements StudentLectureIssueRepository {
 
     async get(classId: ClassId, studentLectureIssueId: StudentLectureIssueId): Promise<StudentLectureIssue | null> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
-        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION_NAME), studentLectureIssueId.id)
+        const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
+        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION), studentLectureIssueId.id)
             .withConverter(studentLectureIssueConverter);
         const studentLectureIssueSnap: DocumentSnapshot<StudentLectureIssue> = await getDoc(studentLectureIssueRef);
         if (studentLectureIssueSnap.exists()) return studentLectureIssueSnap.data();
@@ -27,9 +27,9 @@ export default class StudentLectureIssueRepositoryImpl implements StudentLecture
     }
 
     async getAll(classId: ClassId): Promise<Array<StudentLectureIssue>> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
+        const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
         const studentLectureIssueListSnap: QuerySnapshot =
-            await getDocs(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION_NAME));
+            await getDocs(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION));
         const result: Array<StudentLectureIssue> = new Array<StudentLectureIssue>();
         studentLectureIssueListSnap.forEach((studentLectureIssueDBModel: QueryDocumentSnapshot) => {
             result.push(studentLectureIssueConverter.fromFirestore(studentLectureIssueDBModel));
@@ -38,8 +38,8 @@ export default class StudentLectureIssueRepositoryImpl implements StudentLecture
     }
 
     async getAllByLectureId(classId: ClassId, lectureId: LectureId): Promise<Array<StudentLectureIssue>> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
-        const studentLectureIssueRef = collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION_NAME);
+        const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
+        const studentLectureIssueRef = collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION);
         const q = query(studentLectureIssueRef, where("lectureId", "==", lectureId.id));
         const studentLectureIssueListSnap: QuerySnapshot = await getDocs(q);
         const result: Array<StudentLectureIssue> = new Array<StudentLectureIssue>();
@@ -50,8 +50,8 @@ export default class StudentLectureIssueRepositoryImpl implements StudentLecture
     }
 
     async update(classId: ClassId, studentLectureIssue: StudentLectureIssue): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION_NAME), classId.id);
-        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION_NAME),
+        const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
+        const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION),
             studentLectureIssue.idString);
         const updateModel = studentLectureIssueConverter.toFirestore(studentLectureIssue);
         return updateDoc(studentLectureIssueRef, {
