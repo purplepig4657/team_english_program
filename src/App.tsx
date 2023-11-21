@@ -10,24 +10,32 @@ import WeightManage from './ui/weight_manage/WeightManage';
 
 import './App.css';
 import AppbarAndDrawer from './components/AppbarAndDrawer';
+import {useMediaQuery} from "react-responsive";
+import {DRAWER_WIDTH, MOBILE_SCREEN_MAX_WIDTH} from "./constants/GlobalConstants";
 
 
 function App() {
-  return (
-    <HashRouter>
-      <AppbarAndDrawer />
-      <Routes>
-        <Route path="/" Component={ Dashboard } />
-        <Route path="/dashboard" Component={ Dashboard } />
-        <Route path="/student_list" Component={ StudentList } />
-        <Route path="/student_info" Component={ StudentInfo } />
-        <Route path="/class_list" Component={ ClassList } />
-        <Route path="/class_info" Component={ ClassInfo } />
-        <Route path="/class_manage" Component={ ClassManage } />
-        <Route path="/weight_manage" Component={ WeightManage } />
-      </Routes>
-    </HashRouter>
-  );
+    const isMobileScreen = useMediaQuery({ maxWidth: MOBILE_SCREEN_MAX_WIDTH });
+    let drawerWidth;
+
+    if (isMobileScreen) drawerWidth = '0';
+    else drawerWidth = `${DRAWER_WIDTH}`;
+
+    return (
+        <HashRouter>
+          <AppbarAndDrawer />
+          <Routes>
+            <Route path="/" element={<Dashboard drawerWidth={drawerWidth} />} />
+            <Route path="/dashboard" element={<Dashboard drawerWidth={drawerWidth} />} />
+            <Route path="/student_list" Component={ StudentList } />
+            <Route path="/student_info" Component={ StudentInfo } />
+            <Route path="/class_list" Component={ ClassList } />
+            <Route path="/class_info" Component={ ClassInfo } />
+            <Route path="/class_manage" Component={ ClassManage } />
+            <Route path="/weight_manage" Component={ WeightManage } />
+          </Routes>
+        </HashRouter>
+    );
 }
 
 export default App;

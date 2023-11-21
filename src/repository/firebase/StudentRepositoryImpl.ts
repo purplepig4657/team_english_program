@@ -1,6 +1,6 @@
 import {
     doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, arrayUnion, arrayRemove, collection,
-    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot
+    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot, query, where, orderBy, limit
 } from "firebase/firestore";
 
 import { db } from "../../config/firebaseConfig";
@@ -27,7 +27,8 @@ export default class StudentRepositoryImpl implements StudentRepository {
         const newStudent = new Student(
             new StudentId(newStudentId),
             t.classIdList,
-            t.name
+            t.name,
+            new Date()
         );
         await setDoc(newStudentRef, newStudent);
         return newStudent;
@@ -38,6 +39,38 @@ export default class StudentRepositoryImpl implements StudentRepository {
         const studentSnap: DocumentSnapshot<Student> = await getDoc(studentRef);
         if (studentSnap.exists()) return studentSnap.data();
         else return null;
+    }
+
+    async getLastCreatedStudent(): Promise<Student> {
+        const q = query(collection(db, STUDENT_COLLECTION), orderBy("createdAt", "desc"), limit(1));
+        const studentSnap: QuerySnapshot = await getDocs(q);
+        const result: Array<Student> = new Array<Student>();
+        studentSnap.forEach((studentDBModel: QueryDocumentSnapshot) => {
+            result.push(studentConverter.fromFirestore(studentDBModel));
+        });
+        return result[0];
+    }
+
+    async getAllByIdList(idList: Array<StudentId>): Promise<Array<Student>> {
+        const idStringList: Array<string> = idList.map((id: StudentId) => id.id);
+        const q = query(collection(db, STUDENT_COLLECTION), where("id", 'in', idStringList));
+        const studentListSnap: QuerySnapshot = await getDocs(q);
+        const result: Array<Student> = new Array<Student>();
+        studentListSnap.forEach((studentDBModel: QueryDocumentSnapshot) => {
+            result.push(studentConverter.fromFirestore(studentDBModel));
+        });
+        return result;
+    }
+
+    async getAllByClassId(classId: ClassId): Promise<Array<Student>> {
+        const classIdString: string = classId.id;
+        const q = query(collection(db, STUDENT_COLLECTION), where("classIdList", "array-contains", classIdString));
+        const studentListSnap: QuerySnapshot = await getDocs(q);
+        const result: Array<Student> = new Array<Student>();
+        studentListSnap.forEach((studentDBModel: QueryDocumentSnapshot) => {
+            result.push(studentConverter.fromFirestore(studentDBModel));
+        });
+        return result;
     }
 
     async getAll(): Promise<Array<Student>> {

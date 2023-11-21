@@ -15,6 +15,4 @@ export default interface ClassRepository extends CRUDBase<Class, ClassId> {
     removeStudentLectureIssue(id: ClassId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean>;
     addLecture(id: ClassId, lecture: Lecture): Promise<boolean>;
     removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean>;
-
-
 }

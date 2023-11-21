@@ -3,7 +3,7 @@ import {
     doc,
     DocumentSnapshot,
     getDoc,
-    getDocs,
+    getDocs, limit, orderBy, query,
     QueryDocumentSnapshot,
     QuerySnapshot,
     setDoc, updateDoc
@@ -28,7 +28,9 @@ export default class StudentIssueRepositoryImpl implements StudentIssueRepositor
             t.lateness,
             t.absence,
             t.attitude,
-            t.scoreIssue
+            t.scoreIssue,
+            t.consultation,
+            new Date()
         );
         await setDoc(newStudentIssueRef, newStudentIssue);
         return newStudentIssue;
@@ -39,6 +41,16 @@ export default class StudentIssueRepositoryImpl implements StudentIssueRepositor
         const studentIssueSnap: DocumentSnapshot<StudentIssue> = await getDoc(studentIssueRef);
         if (studentIssueSnap.exists()) return studentIssueSnap.data();
         else return null;
+    }
+
+    async getLastUpdatedStudentIssue(): Promise<StudentIssue> {
+        const q = query(collection(db, STUDENT_ISSUE_COLLECTION), orderBy("updatedAt", "desc"), limit(1));
+        const studentIssueSnap: QuerySnapshot = await getDocs(q);
+        const result: Array<StudentIssue> = new Array<StudentIssue>();
+        studentIssueSnap.forEach((studentIssueDBModel: QueryDocumentSnapshot) => {
+            result.push(studentIssueConverter.fromFirestore(studentIssueDBModel));
+        });
+        return result[0];
     }
 
     async getAll(): Promise<Array<StudentIssue>> {

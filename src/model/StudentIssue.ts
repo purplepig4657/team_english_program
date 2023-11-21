@@ -1,7 +1,14 @@
-import {DocumentData, FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions} from "firebase/firestore";
+import {
+    DocumentData,
+    FirestoreDataConverter,
+    QueryDocumentSnapshot,
+    SnapshotOptions,
+    Timestamp
+} from "firebase/firestore";
 
 import StudentIssueId from "./identifier/StudentIssueId";
 import StudentId from "./identifier/StudentId";
+import {ISSUE_THRESHOLD} from "../constants/GlobalConstants";
 
 export default class StudentIssue {
     private readonly _id: StudentIssueId;
@@ -10,6 +17,8 @@ export default class StudentIssue {
     private _absence: number;
     private _attitude: number;
     private _scoreIssue: number;
+    private _consultation: number;
+    private _updatedAt: Date;
 
     constructor(
         id: StudentIssueId,
@@ -17,7 +26,9 @@ export default class StudentIssue {
         lateness: number,
         absence: number,
         attitude: number,
-        scoreIssue: number
+        scoreIssue: number,
+        consultation: number,
+        updatedAt: Date
     ) {
         this._id = id;
         this._studentId = studentId;
@@ -25,6 +36,17 @@ export default class StudentIssue {
         this._absence = absence;
         this._attitude = attitude;
         this._scoreIssue = scoreIssue;
+        this._consultation = consultation;
+        this._updatedAt = updatedAt;
+    }
+
+    public isIssueStudent(): boolean {
+        return this.getIssueScore() >= ISSUE_THRESHOLD;
+    }
+
+    public getIssueScore(): number {
+        // TODO: Revise this.
+        return this.lateness + this.absence + this.attitude + this.scoreIssue - this.consultation;
     }
 
     get id(): StudentId {
@@ -55,6 +77,14 @@ export default class StudentIssue {
         return this._scoreIssue;
     }
 
+    get consultation(): number {
+        return this._consultation;
+    }
+
+    get updateAt(): Date {
+        return this._updatedAt;
+    }
+
 }
 
 interface StudentIssueDBModel extends DocumentData {
@@ -63,6 +93,8 @@ interface StudentIssueDBModel extends DocumentData {
     absence: number;
     attitude: number;
     scoreIssue: number;
+    consultation: number;
+    updatedAt: Timestamp;
 }
 
 export const studentIssueConverter: FirestoreDataConverter<StudentIssue, StudentIssueDBModel> = {
@@ -72,7 +104,9 @@ export const studentIssueConverter: FirestoreDataConverter<StudentIssue, Student
             lateness: studentIssue.lateness,
             absence: studentIssue.absence,
             attitude: studentIssue.attitude,
-            scoreIssue: studentIssue.scoreIssue
+            scoreIssue: studentIssue.scoreIssue,
+            consultation: studentIssue.consultation,
+            updatedAt: Timestamp.fromDate(studentIssue.updateAt)
         }
     },
     fromFirestore(
@@ -86,7 +120,9 @@ export const studentIssueConverter: FirestoreDataConverter<StudentIssue, Student
             data.lateness,
             data.absence,
             data.attitude,
-            data.scoreIssue
+            data.scoreIssue,
+            data.consultation,
+            data.updatedAt.toDate()
         );
     }
 };

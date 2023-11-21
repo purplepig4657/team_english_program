@@ -8,6 +8,9 @@ import StudentWeekIssue from "../../model/StudentWeekIssue";
 import TuitionPayment from "../../model/TuitionPayment";
 
 export default interface StudentRepository extends CRUDBase<Student, StudentId> {
+    getLastCreatedStudent(): Promise<Student>;
+    getAllByIdList(idList: Array<StudentId>): Promise<Array<Student>>;
+    getAllByClassId(classId: ClassId): Promise<Array<Student>>;
     getAll(): Promise<Array<Student>>;
     addClassId(id: StudentId, classId: ClassId): Promise<boolean>;
     removeClassId(id: StudentId, classId: ClassId): Promise<boolean>;

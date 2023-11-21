@@ -16,8 +16,9 @@ import { Link } from 'react-router-dom';
 import PersonIcon from '@material-ui/icons/Person';
 import ClassIcon from '@material-ui/icons/Class';
 import TimelineIcon from '@material-ui/icons/Timeline';
+import DashboardIcon from '@material-ui/icons/Dashboard'
 
-import { drawerWidth } from '../constants/GlobalConstants';
+import { DRAWER_WIDTH } from '../constants/GlobalConstants';
 
 export default function AppbarAndDrawer() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -31,6 +32,10 @@ export default function AppbarAndDrawer() {
       <Toolbar />
       <Divider />
       <List>
+        <ListItemButton component={Link} to="/dashboard">
+            <ListItemIcon><DashboardIcon /></ListItemIcon>
+            <ListItemText primary="Dashboard" />
+        </ListItemButton>
         <ListItemButton component={Link} to="/class_list">
           <ListItemIcon><ClassIcon /></ListItemIcon>
           <ListItemText primary="Class" />
@@ -53,8 +58,8 @@ export default function AppbarAndDrawer() {
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          ml: { sm: `${DRAWER_WIDTH}px` },
         }}
       >
         <Toolbar>
@@ -70,8 +75,8 @@ export default function AppbarAndDrawer() {
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
+            component={Link}
+            to="/dashboard"
             sx={{
               mr: 2,
               fontWeight: 700,
@@ -79,13 +84,13 @@ export default function AppbarAndDrawer() {
               textDecoration: 'none',
             }}
           >
-            TAEM ENGLISH
+            TEAM ENGLISH
           </Typography>
         </Toolbar>
       </AppBar>
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}
       >
         <Drawer
           container={undefined}
@@ -97,7 +102,7 @@ export default function AppbarAndDrawer() {
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
           }}
         >
           {drawer}
@@ -106,7 +111,7 @@ export default function AppbarAndDrawer() {
           variant="permanent"
           sx={{
             display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
           }}
           open
         >

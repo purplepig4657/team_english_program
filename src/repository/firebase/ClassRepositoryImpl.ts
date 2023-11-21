@@ -22,14 +22,9 @@ import {
 export default class ClassRepositoryImpl implements ClassRepository {
 
     async create(t: Class): Promise<Class> {
-        const newClassRef = doc(collection(db, CLASS_COLLECTION)).withConverter(classConverter);
-        const newClassId: ClassId = new ClassId(newClassRef.id);
-        const newClass: Class = new Class(
-            newClassId,
-            new Array<StudentId>()
-        );
-        await setDoc(newClassRef, newClass);
-        return newClass;
+        const newClassRef = doc(collection(db, CLASS_COLLECTION), t.idString).withConverter(classConverter);
+        await setDoc(newClassRef, t);
+        return t;
     }
 
     async get(id: ClassId): Promise<Class | null> {

@@ -3,20 +3,18 @@ import StudentRepositoryImpl from "../repository/firebase/StudentRepositoryImpl"
 import Student from "../model/Student";
 import StudentId from "../model/identifier/StudentId";
 import StudentWeekIssue from "../model/StudentWeekIssue";
-import StudentIssueRepository from "../repository/interface/StudentIssueRepository";
-import StudentIssueRepositoryImpl from "../repository/firebase/StudentIssueRepositoryImpl";
 import StudentIssue from "../model/StudentIssue";
 import StudentIssueId from "../model/identifier/StudentIssueId";
+import ClassId from "../model/identifier/ClassId";
+import {classService, studentCache, studentIssueService} from "./provider/ServiceProvider";
 
 export default class StudentService {
 
     private static instance: StudentService;
     private _studentRepository: StudentRepository;
-    protected _studentIssueRepository: StudentIssueRepository;
 
     constructor() {
         this._studentRepository = new StudentRepositoryImpl();
-        this._studentIssueRepository = new StudentIssueRepositoryImpl();
     }
 
     public static getInstance() {
@@ -26,10 +24,13 @@ export default class StudentService {
 
     public async createStudent(student: Student): Promise<Student> {
         const newStudent: Student = await this._studentRepository.create(student);
-        await this._studentIssueRepository.create(new StudentIssue(
+        await Promise.all(student.classIdList.map(
+            (classId) => [classService.addStudentId(classId, newStudent.id)]
+        ));
+        await studentIssueService.createStudentIssue(new StudentIssue(
             new StudentIssueId("none"),
             newStudent.id,
-            0, 0, 0, 0
+            0, 0, 0, 0, 0, new Date()
         ));
         return newStudent
     }
@@ -38,8 +39,22 @@ export default class StudentService {
         return await this._studentRepository.get(id);
     }
 
+    /**
+     * @deprecated
+     */
+    public async getStudentListByClassId(id: ClassId): Promise<Array<Student>> {
+        return await this._studentRepository.getAllByClassId(id);
+    }
+
+    /**
+     * @deprecated
+     */
+    public async getAllStudentByIdList(idList: Array<StudentId>): Promise<Array<Student>> {
+        return await this._studentRepository.getAllByIdList(idList);
+    }
+
     public async getAllStudent(): Promise<Array<Student>> {
-        return await this._studentRepository.getAll();
+        return await studentCache.getCachedStudentList();
     }
 
     public async updateStudent(updatedStudent: Student): Promise<boolean> {
