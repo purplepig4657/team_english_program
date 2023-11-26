@@ -30,7 +30,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             // const student = studentService.createStudent(new Student(
             //     new StudentId("none"),
             //     [new ClassId("class1")],
-            //     "Hello7", new Date()),
+            //     "안녕", new Date()),
             // );
             // const classService = ClassService.getInstance();
             // await classService.createClass(new Class(new ClassId("class1"), []));

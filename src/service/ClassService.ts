@@ -4,7 +4,11 @@ import Class from "../model/Class";
 import ClassId from "../model/identifier/ClassId";
 import Student from "../model/Student";
 import StudentId from "../model/identifier/StudentId";
-import {studentService} from "./provider/ServiceProvider";
+import {studentLectureIssueService, studentService} from "./provider/ServiceProvider";
+import Lecture from "../model/Lecture";
+import LectureId from "../model/identifier/LectureId";
+import StudentLectureIssue from "../model/StudentLectureIssue";
+import StudentLectureIssueId from "../model/identifier/StudentLectureIssueId";
 
 export default class ClassService {
 
@@ -35,7 +39,7 @@ export default class ClassService {
     }
 
     public async getAllClassStudent(id: ClassId): Promise<Array<Student>> {
-        return await studentService.getStudentListByClassId(id);
+        return await studentService.getStudentListByClassIdWithCache(id);
     }
 
     public async classIdIsExist(id: ClassId): Promise<boolean> {
@@ -56,6 +60,49 @@ export default class ClassService {
 
     public async addStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
         return await this._classRepository.addStudentId(id, studentId);
+    }
+
+    public async removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
+        return await this._classRepository.removeStudentId(id, studentId);
+    }
+
+    public async addLecture(id: ClassId, lecture: Lecture): Promise<Lecture> {
+        const targetClassStudents: Array<Student> = await this.getAllClassStudent(id);
+        const newLecture: Lecture = await this._classRepository.addLecture(id, lecture);
+        const promiseList: Promise<StudentLectureIssue>[] = [];
+        for (let student of targetClassStudents) {
+            promiseList.push(this.addStudentLectureIssue(id, new StudentLectureIssue(
+                new StudentLectureIssueId("none"), id, newLecture.id, student.id,
+                false, false, false, false,
+                null, null, null, null
+            )));
+        }
+        await Promise.all(promiseList);
+        return newLecture;
+    }
+
+    public async removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean> {
+        const studentLectureIssueList: Array<StudentLectureIssue> =
+            await studentLectureIssueService.getAllStudentLectureIssueByLectureId(id, lectureId);
+        const promiseList: Promise<boolean>[] = [];
+        for (let studentLectureIssue of studentLectureIssueList)
+            promiseList.push(this.removeStudentLectureIssue(id, studentLectureIssue.id));
+        await Promise.all(promiseList);
+        return await this._classRepository.removeLecture(id, lectureId);
+    }
+
+    public async addStudentLectureIssue(
+        id: ClassId,
+        studentLectureIssue: StudentLectureIssue
+    ): Promise<StudentLectureIssue> {
+        return await this._classRepository.addStudentLectureIssue(id, studentLectureIssue);
+    }
+
+    public async removeStudentLectureIssue(
+        id: ClassId,
+        studentLectureIssueId: StudentLectureIssueId
+    ): Promise<boolean> {
+        return await this._classRepository.removeStudentLectureIssue(id, studentLectureIssueId);
     }
 
 }

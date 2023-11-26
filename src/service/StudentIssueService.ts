@@ -2,7 +2,8 @@ import StudentIssueRepository from "../repository/interface/StudentIssueReposito
 import StudentIssueRepositoryImpl from "../repository/firebase/StudentIssueRepositoryImpl";
 import StudentIssue from "../model/StudentIssue";
 import Student from "../model/Student";
-import {studentIssueCache, studentService} from "./provider/ServiceProvider";
+import {studentIssueCache, studentIssueService, studentService} from "./provider/ServiceProvider";
+import StudentId from "../model/identifier/StudentId";
 
 export default class StudentIssueService {
 
@@ -29,7 +30,19 @@ export default class StudentIssueService {
         ));
     }
 
+    public async getStudentIssueByStudentId(studentId: StudentId): Promise<StudentIssue | null> {
+        const studentIssueList: Array<StudentIssue> = await studentIssueCache.getCachedStudentList();
+        for (let studentIssue of studentIssueList) {
+            if (studentIssue.studentId.id === studentId.id) return studentIssue;
+        }
+        return null;
+    }
+
     public async createStudentIssue(studentIssue: StudentIssue): Promise<StudentIssue> {
         return await this._studentIssueRepository.create(studentIssue);
+    }
+
+    public async updateStudentIssue(updatedStudentIssue: StudentIssue): Promise<boolean> {
+        return await this._studentIssueRepository.update(updatedStudentIssue);
     }
 }

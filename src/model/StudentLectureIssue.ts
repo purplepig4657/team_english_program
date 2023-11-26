@@ -52,6 +52,38 @@ export default class StudentLectureIssue {
         this._scoreIssueComment = scoreIssueComment;
     }
 
+    public switchLateness(): void {
+        this._lateness = !this._lateness;
+    }
+
+    public switchAbsence(): void {
+        this._absence = !this._absence;
+    }
+
+    public switchAttitude(): void {
+        this._attitude = !this._attitude;
+    }
+
+    public switchScoreIssue(): void {
+        this._scoreIssue = !this._scoreIssue;
+    }
+
+    public setLatenessComment(content: string): void {
+        this._latenessComment = content;
+    }
+
+    public setAbsenceComment(content: string): void {
+        this._absenceComment = content;
+    }
+
+    public setAttitudeComment(content: string): void {
+        this._attitudeComment = content;
+    }
+
+    public setScoreIssueComment(content: string): void {
+        this._scoreIssueComment = content;
+    }
+
     // Getter
 
     get id(): StudentLectureIssueId {

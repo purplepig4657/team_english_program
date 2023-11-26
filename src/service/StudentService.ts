@@ -46,12 +46,25 @@ export default class StudentService {
         return await this._studentRepository.getAllByClassId(id);
     }
 
+
+    public async getStudentListByClassIdWithCache(id: ClassId): Promise<Array<Student>> {
+        const studentList: Array<Student> = await this.getAllStudent();
+        const classStudentList: Array<Student> = [];
+        for (let student of studentList) {
+            if (student.classIdList.map((classId) => classId.id === id.id).includes(true))
+                classStudentList.push(student);
+        }
+        return classStudentList;
+    }
+
     /**
      * @deprecated
      */
     public async getAllStudentByIdList(idList: Array<StudentId>): Promise<Array<Student>> {
         return await this._studentRepository.getAllByIdList(idList);
     }
+
+
 
     public async getAllStudent(): Promise<Array<Student>> {
         return await studentCache.getCachedStudentList();
@@ -61,11 +74,11 @@ export default class StudentService {
         return await this._studentRepository.update(updatedStudent);
     }
 
-    public async delete(studentId: StudentId): Promise<boolean> {
+    public async deleteStudent(studentId: StudentId): Promise<boolean> {
         return await this._studentRepository.delete(studentId);
     }
 
-    public async addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<boolean> {
+    public async addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<StudentWeekIssue> {
         return await this._studentRepository.addStudentWeekIssue(id, studentWeekIssue);
     }
 

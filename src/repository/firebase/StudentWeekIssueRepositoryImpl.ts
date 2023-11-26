@@ -1,6 +1,6 @@
 import {
     doc, getDoc, getDocs, updateDoc, collection,
-    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot, DocumentReference
+    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot, DocumentReference, query, where
 } from "firebase/firestore";
 
 import {db} from "../../config/firebaseConfig";
@@ -10,6 +10,7 @@ import StudentWeekIssue, {studentWeekIssueConverter} from "../../model/StudentWe
 import StudentWeekIssueId from "../../model/identifier/StudentWeekIssueId";
 import StudentId from "../../model/identifier/StudentId";
 import { STUDENT_COLLECTION, STUDENT_WEEK_ISSUE_COLLECTION } from "../common/firebaseCollectionNames";
+import WeekId from "../../model/identifier/WeekId";
 
 export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueRepository {
 
@@ -20,6 +21,19 @@ export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueR
         const studentWeekIssueSnap: DocumentSnapshot<StudentWeekIssue> = await getDoc(studentWeekIssueRef);
         if (studentWeekIssueSnap.exists()) return studentWeekIssueSnap.data();
         else return null;
+    }
+
+    async getByWeekId(id: StudentId, weekId: WeekId): Promise<StudentWeekIssue | null> {
+        const studentRef = doc(collection(db, STUDENT_COLLECTION), id.id);
+        const q = query(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION), where("weekId", '==', weekId.id));
+        const studentWeekIssueListSnap: QuerySnapshot = await getDocs(q);
+        if (studentWeekIssueListSnap.size > 1) {
+            throw "StudentWeekIssue Duplicated";
+        } else if (studentWeekIssueListSnap.size === 0) {
+            return null;
+        } else {
+            return studentWeekIssueConverter.fromFirestore(studentWeekIssueListSnap.docs[0])
+        }
     }
 
     async getAll(id: StudentId | DocumentReference): Promise<Array<StudentWeekIssue>> {

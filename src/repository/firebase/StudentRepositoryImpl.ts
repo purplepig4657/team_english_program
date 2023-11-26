@@ -109,7 +109,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
         }).then(() => true).catch(() => false);
     }
 
-    async addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<boolean> {
+    async addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<StudentWeekIssue> {
         const studentRef = doc(collection(db, STUDENT_COLLECTION), id.id);
         const studentWeekIssueRef = doc(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION))
             .withConverter(studentWeekIssueConverter);
@@ -122,7 +122,9 @@ export default class StudentRepositoryImpl implements StudentRepository {
             studentWeekIssue.attitude,
             studentWeekIssue.scoreIssue
         );
-        return setDoc(studentWeekIssueRef, newStudentWeekIssue).then(() => true).catch(() => false);
+        // TODO: 예외 처리
+        await setDoc(studentWeekIssueRef, newStudentWeekIssue).then(() => true).catch(() => false);
+        return newStudentWeekIssue;
     }
 
     async removeStudentWeekIssue(id: StudentId, studentWeekIssueId: StudentWeekIssueId): Promise<boolean> {
@@ -131,7 +133,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
         return deleteDoc(studentWeekIssueRef).then(() => true).catch(() => false);
     }
 
-    async addTuitionPayment(id: StudentId, tuitionPayment: TuitionPayment): Promise<boolean> {
+    async addTuitionPayment(id: StudentId, tuitionPayment: TuitionPayment): Promise<TuitionPayment> {
         const studentRef = doc(collection(db, STUDENT_COLLECTION), id.id);
         const tuitionPaymentRef = doc(collection(studentRef, TUITION_PAYMENT_COLLECTION))
             .withConverter(tuitionPaymentConverter);
@@ -141,7 +143,9 @@ export default class StudentRepositoryImpl implements StudentRepository {
             tuitionPayment.amount,
             tuitionPayment.paymentDate
         );
-        return setDoc(tuitionPaymentRef, newTuitionPayment).then(() => true).catch(() => false);
+        // TODO: 예외 처리
+        await setDoc(tuitionPaymentRef, newTuitionPayment).then(() => true).catch(() => false);
+        return newTuitionPayment;
     }
 
     async removeTuitionPayment(id: StudentId, tuitionPaymentId: TuitionPaymentId): Promise<boolean> {

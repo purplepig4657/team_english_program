@@ -26,7 +26,7 @@ const StudentList = (): JSX.Element => {
         >
             StudentList
         </Typography>
-        <FlexContainer flexWrap='wrap' {...{padding: "10px"}}>
+        <FlexContainer flexWrap='wrap' {...{padding: "20px"}}>
             <StudentListTable studentList={studentList} />
         </FlexContainer>
     </Scaffold>;

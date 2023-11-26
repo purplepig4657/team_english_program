@@ -37,6 +37,43 @@ export default class StudentWeekIssue {
         this._scoreIssue = scoreIssue;
     }
 
+    public getIssueScore(): number {
+        // TODO: Revise this.
+        return this.lateness + this.absence + this.attitude + this.scoreIssue;
+    }
+
+    public incrementLateness(): void {
+        this._lateness += 1;
+    }
+
+    public decrementLateness(): void {
+        this._lateness -= 1;
+    }
+
+    public incrementAbsence(): void {
+        this._absence += 1;
+    }
+
+    public decrementAbsence(): void {
+        this._absence -= 1;
+    }
+
+    public incrementAttitude(): void {
+        this._attitude += 1;
+    }
+
+    public decrementAttitude(): void {
+        this._attitude -= 1;
+    }
+
+    public incrementScoreIssue(): void {
+        this._scoreIssue += 1;
+    }
+
+    public decrementScoreIssue(): void {
+        this._scoreIssue -= 1;
+    }
+
     // Getter
 
     get id(): StudentWeekIssueId {

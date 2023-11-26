@@ -14,9 +14,9 @@ export default interface StudentRepository extends CRUDBase<Student, StudentId> 
     getAll(): Promise<Array<Student>>;
     addClassId(id: StudentId, classId: ClassId): Promise<boolean>;
     removeClassId(id: StudentId, classId: ClassId): Promise<boolean>;
-    addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<boolean>;
+    addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<StudentWeekIssue>;
     removeStudentWeekIssue(id: StudentId, studentWeekIssueId: StudentWeekIssueId): Promise<boolean>;
-    addTuitionPayment(id: StudentId, tuitionPayment: TuitionPayment): Promise<boolean>;
+    addTuitionPayment(id: StudentId, tuitionPayment: TuitionPayment): Promise<TuitionPayment>;
     removeTuitionPayment(id: StudentId, tuitionPaymentId: TuitionPaymentId): Promise<boolean>;
 
 }

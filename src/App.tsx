@@ -17,18 +17,21 @@ import {DRAWER_WIDTH, MOBILE_SCREEN_MAX_WIDTH} from "./constants/GlobalConstants
 function App() {
     const isMobileScreen = useMediaQuery({ maxWidth: MOBILE_SCREEN_MAX_WIDTH });
     let drawerWidth;
+    let screenWidth;
 
-    if (isMobileScreen) drawerWidth = '0';
-    else drawerWidth = `${DRAWER_WIDTH}`;
+    if (isMobileScreen) drawerWidth = 0;
+    else drawerWidth = DRAWER_WIDTH;
+
+    screenWidth = `calc(100vw - ${drawerWidth}px)`;
 
     return (
         <HashRouter>
           <AppbarAndDrawer />
           <Routes>
-            <Route path="/" element={<Dashboard drawerWidth={drawerWidth} />} />
-            <Route path="/dashboard" element={<Dashboard drawerWidth={drawerWidth} />} />
+            <Route path="/" element={<Dashboard drawerWidth={`${drawerWidth}`} />} />
+            <Route path="/dashboard" element={<Dashboard drawerWidth={`${drawerWidth}`} />} />
             <Route path="/student_list" Component={ StudentList } />
-            <Route path="/student_info" Component={ StudentInfo } />
+            <Route path="/student_info" element={<StudentInfo drawerWidth={drawerWidth} /> } />
             <Route path="/class_list" Component={ ClassList } />
             <Route path="/class_info" Component={ ClassInfo } />
             <Route path="/class_manage" Component={ ClassManage } />

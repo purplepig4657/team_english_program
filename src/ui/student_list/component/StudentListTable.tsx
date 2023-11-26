@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import SearchBar from "material-ui-search-bar";
 import Student from "../../../model/Student";
+import {useNavigate} from "react-router-dom";
 
 
 interface Column {
@@ -36,6 +37,8 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
     const [searched, setSearched] = React.useState<string>("");
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
+    const navigate = useNavigate();
+
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -57,6 +60,10 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
         requestSearch(searched);
     };
 
+    const studentInfoClick = (student: Student) => {
+        navigate("/student_info", { state: { student: student } })
+    }
+
     React.useEffect(() => {
         (() => {
             setRows(studentList);
@@ -71,7 +78,7 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
             style={{marginBottom: 10}}
         />
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-            <TableContainer sx={{ maxHeight: `calc(100vh - ${250}px)`, minHeight: 300 }}>
+            <TableContainer sx={{ maxHeight: `calc(100vh - ${300}px)`, minHeight: 300 }}>
                 <Table stickyHeader aria-label="sticky table">
                     <TableHead>
                         <TableRow>
@@ -93,6 +100,7 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
                                 return (
                                     <TableRow
                                         hover
+                                        onClick={(event) => studentInfoClick(student)}
                                         key={student.id.id}
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >

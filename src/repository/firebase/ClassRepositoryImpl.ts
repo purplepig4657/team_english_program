@@ -70,7 +70,7 @@ export default class ClassRepositoryImpl implements ClassRepository {
         }).then(() => true).catch(() => false);
     }
 
-    addLecture(id: ClassId, lecture: Lecture): Promise<boolean> {
+    async addLecture(id: ClassId, lecture: Lecture): Promise<Lecture> {
         const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
         const lectureRef = doc(collection(classRef, LECTURE_COLLECTION)).withConverter(lectureConverter);
         const newLecture = new Lecture(
@@ -80,16 +80,18 @@ export default class ClassRepositoryImpl implements ClassRepository {
             lecture.name,
             lecture.teacherName
         );
-        return setDoc(lectureRef, newLecture).then(() => true).catch(() => false);
+        // TODO: 예외 처리
+        await setDoc(lectureRef, newLecture).then(() => true).catch(() => false);
+        return newLecture;
     }
 
-    removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean> {
+    async removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean> {
         const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
         const lectureRef = doc(collection(classRef, LECTURE_COLLECTION), lectureId.id);
-        return deleteDoc(lectureRef).then(() => true).catch(() => false);
+        return await deleteDoc(lectureRef).then(() => true).catch(() => false);
     }
 
-    addStudentLectureIssue(id: ClassId, studentLectureIssue: StudentLectureIssue): Promise<boolean> {
+    async addStudentLectureIssue(id: ClassId, studentLectureIssue: StudentLectureIssue): Promise<StudentLectureIssue> {
         const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
         const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION))
             .withConverter(studentLectureIssueConverter);
@@ -107,7 +109,9 @@ export default class ClassRepositoryImpl implements ClassRepository {
             studentLectureIssue.attitudeComment,
             studentLectureIssue.scoreIssueComment
         );
-        return setDoc(studentLectureIssueRef, newStudentLectureIssue).then(() => true).catch(() => false);
+        // TODO: 예외 처리
+        await setDoc(studentLectureIssueRef, newStudentLectureIssue).then(() => true).catch(() => false);
+        return newStudentLectureIssue;
     }
 
     removeStudentLectureIssue(id: ClassId, studentLectureIssueId: StudentLectureIssueId): Promise<boolean> {
