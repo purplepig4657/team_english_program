@@ -21,6 +21,13 @@ export default class StudentWeekIssueService {
         return await this._studentWeekIssueRepository.getAll(studentId);
     }
 
+    public async getAllStudentWeekIssueByWeekId(
+        studentIdList: Array<StudentId>,
+        weekId: WeekId
+    ): Promise<Array<StudentWeekIssue>> {
+        return await this._studentWeekIssueRepository.getAllByWeekId(studentIdList, weekId);
+    }
+
     public async updateStudentWeekIssue(studentId: StudentId, updatedStudentWeekIssue: StudentWeekIssue): Promise<boolean> {
         return await this._studentWeekIssueRepository.update(studentId, updatedStudentWeekIssue);
     }

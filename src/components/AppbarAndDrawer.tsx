@@ -11,17 +11,24 @@ import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { List, ListItemIcon } from '@mui/material';
-import { Link } from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 
 import PersonIcon from '@material-ui/icons/Person';
 import ClassIcon from '@material-ui/icons/Class';
 import TimelineIcon from '@material-ui/icons/Timeline';
-import DashboardIcon from '@material-ui/icons/Dashboard'
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import ArrowBackIcon from '@material-ui/icons/ArrowBackIos';
 
 import { DRAWER_WIDTH } from '../constants/GlobalConstants';
 
 export default function AppbarAndDrawer() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  const navigate = useNavigate();
+
+  const back = (): void => {
+    navigate(-1);
+  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -62,7 +69,7 @@ export default function AppbarAndDrawer() {
           ml: { sm: `${DRAWER_WIDTH}px` },
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -86,6 +93,9 @@ export default function AppbarAndDrawer() {
           >
             TEAM ENGLISH
           </Typography>
+          <IconButton edge="end" onClick={back}>
+            <ArrowBackIcon style={{ color: "white" }} />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Box
@@ -93,7 +103,6 @@ export default function AppbarAndDrawer() {
         sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}
       >
         <Drawer
-          container={undefined}
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}

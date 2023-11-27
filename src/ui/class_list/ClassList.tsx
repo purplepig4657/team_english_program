@@ -3,8 +3,8 @@ import Scaffold from "../../components/Scaffold";
 import {Typography} from "@mui/material";
 import FlexContainer from "../../components/FlexContainer";
 import Class from "../../model/Class";
-import ClassService from "../../service/ClassService";
 import ClassCard from "./component/ClassCard";
+import { classService } from "../../service/provider/ServiceProvider";
 
 
 const ClassList = (): JSX.Element => {
@@ -12,7 +12,6 @@ const ClassList = (): JSX.Element => {
 
     useEffect(() => {
         (async () => {
-            const classService = ClassService.getInstance();
             setClassList(await classService.getAllClass());
         })();
     }, []);

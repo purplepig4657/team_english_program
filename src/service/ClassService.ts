@@ -4,7 +4,7 @@ import Class from "../model/Class";
 import ClassId from "../model/identifier/ClassId";
 import Student from "../model/Student";
 import StudentId from "../model/identifier/StudentId";
-import {studentLectureIssueService, studentService} from "./provider/ServiceProvider";
+import {lectureService, studentLectureIssueService, studentService} from "./provider/ServiceProvider";
 import Lecture from "../model/Lecture";
 import LectureId from "../model/identifier/LectureId";
 import StudentLectureIssue from "../model/StudentLectureIssue";
@@ -82,13 +82,38 @@ export default class ClassService {
     }
 
     public async removeLecture(id: ClassId, lectureId: LectureId): Promise<boolean> {
+        const targetLecture: Lecture | null = await lectureService.getLecture(id, lectureId);
+        if (targetLecture === null) return false;
         const studentLectureIssueList: Array<StudentLectureIssue> =
             await studentLectureIssueService.getAllStudentLectureIssueByLectureId(id, lectureId);
         const promiseList: Promise<boolean>[] = [];
-        for (let studentLectureIssue of studentLectureIssueList)
+        const issueList: Array<any> = ['lateness', 'absence', 'attitude', 'scoreIssue'];
+        for (let studentLectureIssue of studentLectureIssueList) {
+            for (let issueString of issueList) {
+                if (!this.checkIssue(studentLectureIssue, issueString))
+                    promiseList.push(studentLectureIssueService.switchIndicator(
+                        id, targetLecture, studentLectureIssue, issueString));
+            }
             promiseList.push(this.removeStudentLectureIssue(id, studentLectureIssue.id));
+        }
         await Promise.all(promiseList);
         return await this._classRepository.removeLecture(id, lectureId);
+    }
+
+    private checkIssue(
+        studentLectureIssue: StudentLectureIssue,
+        targetIssue: 'lateness' | 'absence' | 'attitude' | 'scoreIssue'
+    ): boolean {
+        switch (targetIssue) {
+            case "lateness":
+                return studentLectureIssue.lateness;
+            case "absence":
+                return studentLectureIssue.absence;
+            case "attitude":
+                return studentLectureIssue.attitude;
+            case "scoreIssue":
+                return studentLectureIssue.scoreIssue;
+        }
     }
 
     public async addStudentLectureIssue(

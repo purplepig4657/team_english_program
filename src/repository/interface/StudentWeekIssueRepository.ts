@@ -9,6 +9,7 @@ export default interface StudentWeekIssueRepository {
     get(studentId: StudentId, studentWeekIssueId: StudentWeekIssueId): Promise<StudentWeekIssue | null>;
     getByWeekId(studentId: StudentId, weekId: WeekId): Promise<StudentWeekIssue | null>;
     getAll(studentId: StudentId): Promise<Array<StudentWeekIssue>>;
+    getAllByWeekId(studentIdList: Array<StudentId>, weekId: WeekId): Promise<Array<StudentWeekIssue>>;
     update(studentId: StudentId, studentWeekIssue: StudentWeekIssue): Promise<boolean>;
 
 }

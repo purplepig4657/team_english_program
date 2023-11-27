@@ -33,7 +33,7 @@ function App() {
             <Route path="/student_list" Component={ StudentList } />
             <Route path="/student_info" element={<StudentInfo drawerWidth={drawerWidth} /> } />
             <Route path="/class_list" Component={ ClassList } />
-            <Route path="/class_info" Component={ ClassInfo } />
+            <Route path="/class_info" element={ <ClassInfo drawerWidth={drawerWidth} /> } />
             <Route path="/class_manage" Component={ ClassManage } />
             <Route path="/weight_manage" Component={ WeightManage } />
           </Routes>

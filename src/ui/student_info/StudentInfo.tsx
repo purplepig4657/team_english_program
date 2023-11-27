@@ -17,6 +17,7 @@ import ClassId from "../../model/identifier/ClassId";
 import Lecture from "../../model/Lecture";
 import LectureId from "../../model/identifier/LectureId";
 import IssueChart from "./component/IssueChart";
+import {ResponsiveContainer} from "recharts";
 
 
 interface StudentInfoProps {
@@ -63,9 +64,6 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
         studentObject._name,
         studentObject._createdAt
     );
-
-    const classIdStringList: Array<string> = student.classIdList.map((classId: ClassId) => classId.id);
-    const classIdListJoin: string = classIdStringList.join(', ');
 
     useEffect(() => {
         (async () => {
@@ -150,7 +148,7 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
                     fontSize: { xs: '20px', sm: "25px" }
                 }}
             >
-                {" / " + classIdListJoin}
+                {" / " + student.getClassIdListString()}
             </Typography>
         </FlexContainer>
         <FlexContainer flexDirection='column' {...{ padding: "20px" }}>
@@ -202,17 +200,47 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
             <IssueChart data={data.calculated} width={screenWidthNumeric - SCREEN_SIZE_MARGIN}
                         stroke="#FF6666" name="Calculated Issue" />
 
-            <FlexContainer>
-                <IssueChart data={data.lateness} width={(screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2}
-                            stroke="#004E72" name="lateness" />
-                <IssueChart data={data.absense} width={(screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2}
-                            stroke="#F96F2E" name="absense" />
-            </FlexContainer>
-            <FlexContainer>
-                <IssueChart data={data.attitude} width={(screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2}
-                            stroke="#7F65C5" name="attitude" />
-                <IssueChart data={data.scoreIssue} width={(screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2}
-                            stroke="#00B574" name="scoreIssue" />
+            <FlexContainer flexWrap='wrap'>
+                <Box sx={{
+                    width: {
+                        xs: (screenWidthNumeric - SCREEN_SIZE_MARGIN),
+                        md: (screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2
+                    }
+                }}>
+                    <ResponsiveContainer width='100%'>
+                        <IssueChart data={data.lateness} stroke="#004E72" name="lateness" />
+                    </ResponsiveContainer>
+                </Box>
+                <Box sx={{
+                    width: {
+                        xs: (screenWidthNumeric - SCREEN_SIZE_MARGIN),
+                        md: (screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2
+                    }
+                }}>
+                    <ResponsiveContainer width='100%'>
+                        <IssueChart data={data.absense} stroke="#F96F2E" name="absense" />
+                    </ResponsiveContainer>
+                </Box>
+                <Box sx={{
+                    width: {
+                        xs: (screenWidthNumeric - SCREEN_SIZE_MARGIN),
+                        md: (screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2
+                    }
+                }}>
+                    <ResponsiveContainer width='100%'>
+                        <IssueChart data={data.attitude} stroke="#7F65C5" name="attitude" />
+                    </ResponsiveContainer>
+                </Box>
+                <Box sx={{
+                    width: {
+                        xs: (screenWidthNumeric - SCREEN_SIZE_MARGIN),
+                        md: (screenWidthNumeric - SCREEN_SIZE_MARGIN) / 2
+                    }
+                }}>
+                    <ResponsiveContainer width='100%'>
+                        <IssueChart data={data.scoreIssue} stroke="#00B574" name="scoreIssue" />
+                    </ResponsiveContainer>
+                </Box>
             </FlexContainer>
 
         </FlexContainer>
