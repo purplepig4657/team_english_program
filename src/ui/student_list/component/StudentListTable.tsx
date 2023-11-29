@@ -1,12 +1,15 @@
 import React from "react";
 import {
+    Fab,
     Paper, Table, TableBody,
     TableCell, TableContainer,
     TableHead, TablePagination, TableRow
 } from "@mui/material";
 import SearchBar from "material-ui-search-bar";
+import AddIcon from "@material-ui/icons/Add";
 import Student from "../../../model/Student";
 import {useNavigate} from "react-router-dom";
+import FlexContainer from "../../../components/FlexContainer";
 
 
 interface Column {
@@ -64,6 +67,10 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
         navigate("/student_info", { state: { student: student } })
     }
 
+    const studentCreateClick = () => {
+        navigate("/student_update", { state: { student: null } })
+    }
+
     React.useEffect(() => {
         (() => {
             setRows(studentList);
@@ -71,12 +78,17 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
     }, [studentList]);
 
     return <>
-        <SearchBar
-            value={searched}
-            onChange={(searchVal) => requestSearch(searchVal)}
-            onCancelSearch={() => cancelSearch()}
-            style={{marginBottom: 10}}
-        />
+        <FlexContainer width="100%" justifyContent='space-between'>
+            <SearchBar
+                value={searched}
+                onChange={(searchVal) => requestSearch(searchVal)}
+                onCancelSearch={() => cancelSearch()}
+                style={{marginBottom: 10}}
+            />
+            <Fab size="medium" color="primary" onClick={studentCreateClick}>
+                <AddIcon />
+            </Fab>
+        </FlexContainer>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer sx={{ maxHeight: `calc(100vh - ${300}px)`, minHeight: 300 }}>
                 <Table stickyHeader aria-label="sticky table">

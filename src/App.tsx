@@ -12,6 +12,7 @@ import './App.css';
 import AppbarAndDrawer from './components/AppbarAndDrawer';
 import {useMediaQuery} from "react-responsive";
 import {DRAWER_WIDTH, MOBILE_SCREEN_MAX_WIDTH} from "./constants/GlobalConstants";
+import StudentUpdate from "./ui/student_update/StudentUpdate";
 
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard drawerWidth={`${drawerWidth}`} />} />
             <Route path="/student_list" Component={ StudentList } />
             <Route path="/student_info" element={<StudentInfo drawerWidth={drawerWidth} /> } />
+            <Route path="/student_update" Component={ StudentUpdate } />
             <Route path="/class_list" Component={ ClassList } />
             <Route path="/class_info" element={ <ClassInfo drawerWidth={drawerWidth} /> } />
             <Route path="/class_manage" Component={ ClassManage } />
