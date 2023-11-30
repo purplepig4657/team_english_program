@@ -2,8 +2,9 @@ import StudentIssueRepository from "../repository/interface/StudentIssueReposito
 import StudentIssueRepositoryImpl from "../repository/firebase/StudentIssueRepositoryImpl";
 import StudentIssue from "../model/StudentIssue";
 import Student from "../model/Student";
-import {studentIssueCache, studentIssueService, studentService} from "./provider/ServiceProvider";
+import {studentIssueCache, studentService} from "./provider/ServiceProvider";
 import StudentId from "../model/identifier/StudentId";
+import StudentIssueId from "../model/identifier/StudentIssueId";
 
 export default class StudentIssueService {
 
@@ -45,4 +46,23 @@ export default class StudentIssueService {
     public async updateStudentIssue(updatedStudentIssue: StudentIssue): Promise<boolean> {
         return await this._studentIssueRepository.update(updatedStudentIssue);
     }
+    
+    public async deleteStudentIssue(studentIssueId: StudentIssueId): Promise<boolean> {
+        return await this._studentIssueRepository.delete(studentIssueId);
+    }
+
+    public async deleteStudentIssueByStudentId(studentId: StudentId): Promise<boolean> {
+        const targetStudentIssue: StudentIssue | null = await this.getStudentIssueByStudentId(studentId);
+        if (targetStudentIssue === null) return false;
+        return await this.deleteStudentIssue(targetStudentIssue.id);
+    }
+
+    public async deleteStudentIssueBothStoreAndCacheByStudentId(studentId: StudentId): Promise<Array<StudentIssue>> {
+        const targetStudentIssue: StudentIssue | null = await this.getStudentIssueByStudentId(studentId);
+        if (targetStudentIssue === null) return await studentIssueCache.getCachedStudentList();
+        const isSuccess: boolean = await this.deleteStudentIssue(targetStudentIssue.id);
+        if (isSuccess) return studentIssueCache.removeStudentIssueCacheById(targetStudentIssue.id);
+        else return await studentIssueCache.getCachedStudentList();
+    }
+
 }

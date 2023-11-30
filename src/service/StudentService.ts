@@ -6,7 +6,8 @@ import StudentWeekIssue from "../model/StudentWeekIssue";
 import StudentIssue from "../model/StudentIssue";
 import StudentIssueId from "../model/identifier/StudentIssueId";
 import ClassId from "../model/identifier/ClassId";
-import {classService, studentCache, studentIssueService} from "./provider/ServiceProvider";
+import {studentCache, studentIssueService} from "./provider/ServiceProvider";
+import studentUpdate from "../ui/student_update/StudentUpdate";
 
 export default class StudentService {
 
@@ -23,10 +24,11 @@ export default class StudentService {
     }
 
     public async createStudent(student: Student): Promise<Student> {
+        // TODO: Transaction 처리
         const newStudent: Student = await this._studentRepository.create(student);
-        await Promise.all(student.classIdList.map(
-            (classId) => [classService.addStudentId(classId, newStudent.id)]
-        ));
+        // await Promise.all(student.classIdList.map(
+        //     (classId) => [classService.addStudentId(classId, newStudent.id)]
+        // ));
         await studentIssueService.createStudentIssue(new StudentIssue(
             new StudentIssueId("none"),
             newStudent.id,
@@ -71,11 +73,36 @@ export default class StudentService {
     }
 
     public async updateStudent(updatedStudent: Student): Promise<boolean> {
+        updatedStudent.changeUpdatedAt();
         return await this._studentRepository.update(updatedStudent);
     }
 
+    public async updateStudentBothStoreAndCache(updatedStudent: Student): Promise<boolean> {
+        updatedStudent.changeUpdatedAt();
+        const isSuccess: boolean = await this._studentRepository.update(updatedStudent);
+        if (isSuccess) {
+            if (!studentCache.updateStudentCache(updatedStudent)) await studentCache.cacheReload();
+        }
+        return isSuccess;
+    }
+
     public async deleteStudent(studentId: StudentId): Promise<boolean> {
+        // const targetStudent: Student | null = await this.getStudent(studentId);
+        // if (targetStudent === null) return false;
+        // await Promise.all(targetStudent.classIdList.map(
+        //     (classId) => [classService.removeStudentId(classId, targetStudent.id)]
+        // ));
+        // TODO: Transaction 처리
+        await studentIssueService.getStudentIssueByStudentId(studentId);
         return await this._studentRepository.delete(studentId);
+    }
+
+    public async deleteStudentBothStoreAndCache(studentId: StudentId): Promise<Array<Student>> {
+        // TODO: Transaction 처리
+        const isSuccess = await this.deleteStudent(studentId);
+        await studentIssueService.deleteStudentIssueBothStoreAndCacheByStudentId(studentId);
+        if (isSuccess) return studentCache.removeStudentCacheById(studentId);
+        else return await studentCache.getCachedStudentList();
     }
 
     public async addStudentWeekIssue(id: StudentId, studentWeekIssue: StudentWeekIssue): Promise<StudentWeekIssue> {

@@ -37,6 +37,7 @@ export default class StudentIssueRepositoryImpl implements StudentIssueRepositor
     }
 
     async get(id: StudentIssueId): Promise<StudentIssue | null> {
+        console.log("StudentIssueRepositoryImpl read");
         const studentIssueRef = doc(collection(db, STUDENT_ISSUE_COLLECTION), id.id).withConverter(studentIssueConverter);
         const studentIssueSnap: DocumentSnapshot<StudentIssue> = await getDoc(studentIssueRef);
         if (studentIssueSnap.exists()) return studentIssueSnap.data();
@@ -44,6 +45,7 @@ export default class StudentIssueRepositoryImpl implements StudentIssueRepositor
     }
 
     async getLastUpdatedStudentIssue(): Promise<StudentIssue> {
+        console.log("StudentIssueRepositoryImpl read");
         const q = query(collection(db, STUDENT_ISSUE_COLLECTION), orderBy("updatedAt", "desc"), limit(1));
         const studentIssueSnap: QuerySnapshot = await getDocs(q);
         const result: Array<StudentIssue> = new Array<StudentIssue>();
@@ -54,6 +56,7 @@ export default class StudentIssueRepositoryImpl implements StudentIssueRepositor
     }
 
     async getAll(): Promise<Array<StudentIssue>> {
+        console.log("StudentIssueRepositoryImpl read");
         const studentIssueListSnap: QuerySnapshot = await getDocs(collection(db, STUDENT_ISSUE_COLLECTION));
         const result: Array<StudentIssue> = new Array<StudentIssue>();
         studentIssueListSnap.forEach((studentIssueDBModel: QueryDocumentSnapshot) => {

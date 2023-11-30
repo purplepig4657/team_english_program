@@ -18,6 +18,7 @@ import LectureId from "../../model/identifier/LectureId";
 export default class StudentLectureIssueRepositoryImpl implements StudentLectureIssueRepository {
 
     async get(classId: ClassId, studentLectureIssueId: StudentLectureIssueId): Promise<StudentLectureIssue | null> {
+        console.log("StudentLectureIssueRepositoryImpl read");
         const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
         const studentLectureIssueRef = doc(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION), studentLectureIssueId.id)
             .withConverter(studentLectureIssueConverter);
@@ -27,6 +28,7 @@ export default class StudentLectureIssueRepositoryImpl implements StudentLecture
     }
 
     async getAll(classId: ClassId): Promise<Array<StudentLectureIssue>> {
+        console.log("StudentLectureIssueRepositoryImpl read");
         const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
         const studentLectureIssueListSnap: QuerySnapshot =
             await getDocs(collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION));
@@ -38,6 +40,7 @@ export default class StudentLectureIssueRepositoryImpl implements StudentLecture
     }
 
     async getAllByLectureId(classId: ClassId, lectureId: LectureId): Promise<Array<StudentLectureIssue>> {
+        console.log("StudentLectureIssueRepositoryImpl read");
         const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
         const studentLectureIssueRef = collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION);
         const q = query(studentLectureIssueRef, where("lectureId", "==", lectureId.id));

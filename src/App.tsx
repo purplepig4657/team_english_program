@@ -13,6 +13,8 @@ import AppbarAndDrawer from './components/AppbarAndDrawer';
 import {useMediaQuery} from "react-responsive";
 import {DRAWER_WIDTH, MOBILE_SCREEN_MAX_WIDTH} from "./constants/GlobalConstants";
 import StudentUpdate from "./ui/student_update/StudentUpdate";
+import ClassUpdate from "./ui/class_update/ClassUpdate";
+import LectureUpdate from "./ui/lecture_update/LectureUpdate";
 
 
 function App() {
@@ -36,7 +38,9 @@ function App() {
             <Route path="/student_update" Component={ StudentUpdate } />
             <Route path="/class_list" Component={ ClassList } />
             <Route path="/class_info" element={ <ClassInfo drawerWidth={drawerWidth} /> } />
+            <Route path="/class_update" Component={ ClassUpdate } />
             <Route path="/class_manage" Component={ ClassManage } />
+            <Route path="/lecture_update" Component={ LectureUpdate } />
             <Route path="/weight_manage" Component={ WeightManage } />
           </Routes>
         </HashRouter>

@@ -28,6 +28,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
             new StudentId(newStudentId),
             t.classIdList,
             t.name,
+            new Date(),
             new Date()
         );
         await setDoc(newStudentRef, newStudent);
@@ -35,6 +36,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
     }
 
     async get(id: StudentId): Promise<Student | null> {
+        console.log("StudentRepositoryImpl read");
         const studentRef = doc(collection(db, STUDENT_COLLECTION), id.id).withConverter(studentConverter);
         const studentSnap: DocumentSnapshot<Student> = await getDoc(studentRef);
         if (studentSnap.exists()) return studentSnap.data();
@@ -42,6 +44,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
     }
 
     async getLastCreatedStudent(): Promise<Student> {
+        console.log("StudentRepositoryImpl read");
         const q = query(collection(db, STUDENT_COLLECTION), orderBy("createdAt", "desc"), limit(1));
         const studentSnap: QuerySnapshot = await getDocs(q);
         const result: Array<Student> = new Array<Student>();
@@ -51,7 +54,19 @@ export default class StudentRepositoryImpl implements StudentRepository {
         return result[0];
     }
 
+    async getLastUpdatedStudent(): Promise<Student> {
+        console.log("StudentRepositoryImpl read");
+        const q = query(collection(db, STUDENT_COLLECTION), orderBy("updatedAt", "desc"), limit(1));
+        const studentSnap: QuerySnapshot = await getDocs(q);
+        const result: Array<Student> = new Array<Student>();
+        studentSnap.forEach((studentDBModel: QueryDocumentSnapshot) => {
+            result.push(studentConverter.fromFirestore(studentDBModel));
+        });
+        return result[0];
+    }
+
     async getAllByIdList(idList: Array<StudentId>): Promise<Array<Student>> {
+        console.log("StudentRepositoryImpl read");
         const idStringList: Array<string> = idList.map((id: StudentId) => id.id);
         const q = query(collection(db, STUDENT_COLLECTION), where("id", 'in', idStringList));
         const studentListSnap: QuerySnapshot = await getDocs(q);
@@ -63,6 +78,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
     }
 
     async getAllByClassId(classId: ClassId): Promise<Array<Student>> {
+        console.log("StudentRepositoryImpl read");
         const classIdString: string = classId.id;
         const q = query(collection(db, STUDENT_COLLECTION), where("classIdList", "array-contains", classIdString));
         const studentListSnap: QuerySnapshot = await getDocs(q);
@@ -74,6 +90,7 @@ export default class StudentRepositoryImpl implements StudentRepository {
     }
 
     async getAll(): Promise<Array<Student>> {
+        console.log("StudentRepositoryImpl read");
         const studentListSnap: QuerySnapshot = await getDocs(collection(db, STUDENT_COLLECTION));
         const result: Array<Student> = new Array<Student>();
         studentListSnap.forEach((studentDBModel: QueryDocumentSnapshot) => {

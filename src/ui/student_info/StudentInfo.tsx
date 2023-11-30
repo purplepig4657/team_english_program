@@ -62,17 +62,18 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
         new StudentId(studentObject._id._id),
         classIdList,
         studentObject._name,
-        studentObject._createdAt
+        studentObject._createdAt,
+        studentObject._updatedAt,
     );
 
     useEffect(() => {
         (async () => {
-            // await classService.addLecture(student.classIdList[0], new Lecture(
+            // await classService.addLecture(new ClassId("testClass2"), new Lecture(
             //     new LectureId("none"),
             //     student.classIdList[0],
             //     WeekId.thisWeek(),
-            //     "teacher",
-            //     "lecture_name"
+            //     "lecture_name",
+            //     "teacher"
             // ));
             // const lecture = await lectureService.getLecture(student.classIdList[0], new LectureId("iQfxGrJerqqd0DXA7ZUM"));
             // const lectureIssueList = await studentLectureIssueService.getAllStudentLectureIssueByLectureId(

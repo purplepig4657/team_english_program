@@ -16,6 +16,7 @@ import issueChart from "../../ui/student_info/component/IssueChart";
 export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueRepository {
 
     async get(id: StudentId | DocumentReference, studentWeekIssueId: StudentWeekIssueId): Promise<StudentWeekIssue | null> {
+        console.log("StudentWeekIssueRepositoryImpl read");
         const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION), id.id) : id;
         const studentWeekIssueRef = doc(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION), studentWeekIssueId.id)
             .withConverter(studentWeekIssueConverter);
@@ -25,6 +26,7 @@ export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueR
     }
 
     async getByWeekId(id: StudentId, weekId: WeekId): Promise<StudentWeekIssue | null> {
+        console.log("StudentWeekIssueRepositoryImpl read");
         const studentRef = doc(collection(db, STUDENT_COLLECTION), id.id);
         const q = query(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION), where("weekId", '==', weekId.id));
         const studentWeekIssueListSnap: QuerySnapshot = await getDocs(q);
@@ -38,6 +40,7 @@ export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueR
     }
 
     async getAll(id: StudentId | DocumentReference): Promise<Array<StudentWeekIssue>> {
+        console.log("StudentWeekIssueRepositoryImpl read");
         const studentRef = id instanceof StudentId ? doc(collection(db, STUDENT_COLLECTION), id.id) : id;
         const studentWeekIssueListSnap: QuerySnapshot =
             await getDocs(collection(studentRef, STUDENT_WEEK_ISSUE_COLLECTION));
@@ -49,6 +52,7 @@ export default class StudentWeekIssueRepositoryImpl implements StudentWeekIssueR
     }
 
     async getAllByWeekId(studentIdList: Array<StudentId>, weekId: WeekId): Promise<Array<StudentWeekIssue>> {
+        console.log("StudentWeekIssueRepositoryImpl read");
         const studentIdStringList: Array<string> = studentIdList.map((studentId: StudentId) => studentId.id);
         const q = query(
             collectionGroup(db, STUDENT_WEEK_ISSUE_COLLECTION),

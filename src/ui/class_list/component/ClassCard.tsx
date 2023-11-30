@@ -1,7 +1,8 @@
 import {Button, Card, CardActions, CardContent, Typography} from "@mui/material";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Class from "../../../model/Class";
 import {useNavigate} from "react-router-dom";
+import {classService} from "../../../service/provider/ServiceProvider";
 
 
 interface ClassCardProps {
@@ -12,7 +13,15 @@ interface ClassCardProps {
 const ClassCard: React.FC<ClassCardProps> = ({
     classObject
 }) => {
+    const [studentCount, setStudentCount] = useState<number>(0);
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        (async () => {
+            setStudentCount((await classService.getAllClassStudent(classObject.id)).length)
+        })();
+    }, []);
 
     const classInfoClick = (classObject: Class) => {
         navigate("/class_info", { state: { classObject: classObject } })
@@ -29,7 +38,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
                     {classObject.id.id}
                 </Typography>
                 <Typography sx={{ mt: 1 }} color="text.secondary">
-                    {classObject.studentIdList.length} students
+                    {studentCount} students
                 </Typography>
             </CardContent>
             <CardActions>

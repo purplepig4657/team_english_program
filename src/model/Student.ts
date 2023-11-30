@@ -13,22 +13,38 @@ export default class Student {
     private _classIdList: Array<ClassId>;
     private _name: string;
     private _createdAt: Date;
+    private _updatedAt: Date;
     
     constructor(
         id: StudentId, 
         classIdList: Array<ClassId>, 
         name: string,
-        createdAt: Date
+        createdAt: Date,
+        updatedAt: Date
     ) {
         this._id = id;
         this._classIdList = classIdList;
         this._name = name;
-        this._createdAt = createdAt;
+        this._createdAt = createdAt
+        this._updatedAt = updatedAt;
     }
 
     public getClassIdListString(): string {
         const classIdStringList = this.classIdList.map((id: ClassId) => id.id);
         return classIdStringList.join(', ')
+    }
+
+    public changeName(newName: string) {
+        this._name = newName;
+    }
+
+    public changeClassIdList(newClassIdList: Array<ClassId>) {
+        this._classIdList = newClassIdList;
+    }
+
+    public changeUpdatedAt(date?: Date | undefined) {
+        if (date === undefined) this._updatedAt = new Date();
+        else this._updatedAt = date;
     }
 
     // Getter
@@ -53,12 +69,17 @@ export default class Student {
         return this._createdAt;
     }
 
+    get updatedAt(): Date {
+        return this._updatedAt;
+    }
+
 }
 
 interface StudentDBModel extends DocumentData {
     classIdList: Array<string>;
     name: string;
     createdAt: Timestamp;
+    updatedAt: Timestamp;
 }
 
 export const studentConverter: FirestoreDataConverter<Student, StudentDBModel> = {
@@ -66,7 +87,8 @@ export const studentConverter: FirestoreDataConverter<Student, StudentDBModel> =
         return {
             classIdList: student.classIdList.map((classId: ClassId) => classId.id),
             name: student.name,
-            createdAt: Timestamp.fromDate(student.createdAt)
+            createdAt: Timestamp.fromDate(student.createdAt),
+            updatedAt: Timestamp.fromDate(student.updatedAt)
         };
     },
     fromFirestore: (
@@ -80,7 +102,8 @@ export const studentConverter: FirestoreDataConverter<Student, StudentDBModel> =
             new StudentId(snapshot.id),
             classIdList,
             data.name,
-            data.createdAt.toDate()
+            data.createdAt.toDate(),
+            data.updatedAt.toDate()
         );
     },
 };

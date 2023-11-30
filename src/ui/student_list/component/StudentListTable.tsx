@@ -3,27 +3,31 @@ import {
     Fab,
     Paper, Table, TableBody,
     TableCell, TableContainer,
-    TableHead, TablePagination, TableRow
+    TableHead, TablePagination, TableRow, ToggleButton
 } from "@mui/material";
 import SearchBar from "material-ui-search-bar";
 import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 import Student from "../../../model/Student";
 import {useNavigate} from "react-router-dom";
 import FlexContainer from "../../../components/FlexContainer";
+import IconButton from "@mui/material/IconButton";
+import {studentService} from "../../../service/provider/ServiceProvider";
 
 
 interface Column {
     id: 'name' | 'classes' | 'createdAt';
     label: string;
     minWidth?: number;
-    align?: 'right';
+    align?: 'right' | 'left';
     format?: (value: number) => string;
 }
 
 const columns: readonly Column[] = [
-    { id: 'name', label: 'Name', minWidth: 170 },
-    { id: 'classes', label: 'Classes', minWidth: 100, align: 'right' },
-    { id: 'createdAt', label: 'CreatedAt', minWidth: 170, align: 'right'},
+    { id: 'name', label: 'Name', minWidth: 100 },
+    { id: 'classes', label: 'Classes', minWidth: 100, align: 'left' },
+    { id: 'createdAt', label: 'CreatedAt', minWidth: 110, align: 'right'},
 ];
 
 
@@ -38,6 +42,7 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
     const [page, setPage] = React.useState(0);
     const [rows, setRows] = React.useState<Array<Student>>(studentList);
     const [searched, setSearched] = React.useState<string>("");
+    const [editToggle, setEditToggle] = React.useState<boolean>(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
     const navigate = useNavigate();
@@ -71,6 +76,15 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
         navigate("/student_update", { state: { student: null } })
     }
 
+    const studentUpdateClick = (targetStudent: Student) => {
+        navigate("/student_update", { state: { student: targetStudent } })
+    }
+
+    const deleteStudent = async (targetStudent: Student) => {
+        const studentList = await studentService.deleteStudentBothStoreAndCache(targetStudent.id);
+        setRows(studentList);
+    }
+
     React.useEffect(() => {
         (() => {
             setRows(studentList);
@@ -85,9 +99,24 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
                 onCancelSearch={() => cancelSearch()}
                 style={{marginBottom: 10}}
             />
-            <Fab size="medium" color="primary" onClick={studentCreateClick}>
-                <AddIcon />
-            </Fab>
+            <FlexContainer alignItems="center">
+                <ToggleButton
+                    value="check"
+                    selected={editToggle}
+                    onChange={() => {
+                        setEditToggle(!editToggle);
+                    }}
+                    sx={{
+                        mr: 2,
+                        p: 1
+                    }}
+                >
+                    <EditIcon />
+                </ToggleButton>
+                <Fab size="small" color="primary" onClick={studentCreateClick}>
+                    <AddIcon />
+                </Fab>
+            </FlexContainer>
         </FlexContainer>
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <TableContainer sx={{ maxHeight: `calc(100vh - ${300}px)`, minHeight: 300 }}>
@@ -103,6 +132,14 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
                                     {column.label}
                                 </TableCell>
                             ))}
+                            {editToggle &&
+                                <TableCell
+                                    align="right"
+                                    style={{ minWidth: 120 }}
+                                >
+                                    Edit
+                                </TableCell>
+                            }
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -112,19 +149,48 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
                                 return (
                                     <TableRow
                                         hover
-                                        onClick={(event) => studentInfoClick(student)}
                                         key={student.id.id}
-                                        sx={{'&:last-child td, &:last-child th': {border: 0}}}
+                                        sx={{ '&:last-child td, &:last-child th': {border: 0} }}
                                     >
-                                        <TableCell component="th" scope="row">
+                                        <TableCell
+                                            onClick={(event) => studentInfoClick(student)}
+                                            component="th"
+                                            scope="row"
+                                        >
                                             {`${student.name}`}
                                         </TableCell>
-                                        <TableCell align="right">{student.getClassIdListString()}</TableCell>
-                                        <TableCell align="right">{
-                                            student.createdAt.getFullYear() +
-                                            "-" + (student.createdAt.getMonth() + 1) +
-                                            "-" + student.createdAt.getDate()
-                                        }</TableCell>
+                                        <TableCell
+                                            onClick={(event) => studentInfoClick(student)}
+                                            align="left"
+                                        >
+                                            {student.getClassIdListString()}
+                                        </TableCell>
+                                        <TableCell
+                                            onClick={(event) => studentInfoClick(student)}
+                                            align="right"
+                                        >
+                                            {student.updatedAt.getFullYear() +
+                                            "-" + (student.updatedAt.getMonth() + 1) +
+                                            "-" + student.updatedAt.getDate()}
+                                        </TableCell>
+                                        {editToggle &&
+                                            <TableCell align="right">
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => studentUpdateClick(student)}
+                                                    sx={{ mr: 1 }}
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>
+                                                <IconButton
+                                                    size="small"
+                                                    color="warning"
+                                                    onClick={() => deleteStudent(student)}
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </TableCell>
+                                        }
                                     </TableRow>
                                 )
                             })

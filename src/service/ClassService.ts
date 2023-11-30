@@ -26,6 +26,7 @@ export default class ClassService {
     }
 
     public async createClass(classObject: Class): Promise<Class | null> {
+        if (classObject.idString.includes(' ')) return null;
         if (await this.classIdIsExist(classObject.id)) return null;
         return await this._classRepository.create(classObject);
     }
@@ -58,13 +59,13 @@ export default class ClassService {
         return await this._classRepository.delete(id);
     }
 
-    public async addStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
-        return await this._classRepository.addStudentId(id, studentId);
-    }
-
-    public async removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
-        return await this._classRepository.removeStudentId(id, studentId);
-    }
+    // public async addStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
+    //     return await this._classRepository.addStudentId(id, studentId);
+    // }
+    //
+    // public async removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
+    //     return await this._classRepository.removeStudentId(id, studentId);
+    // }
 
     public async addLecture(id: ClassId, lecture: Lecture): Promise<Lecture> {
         const targetClassStudents: Array<Student> = await this.getAllClassStudent(id);

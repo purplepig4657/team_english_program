@@ -1,17 +1,16 @@
 import React, {useEffect, useState} from "react";
-import FlexContainer from "../../components/FlexContainer";
 import {Avatar, List, ListItem, ListItemAvatar, Paper, Typography} from "@mui/material";
 import PersonIcon from "@material-ui/icons/Person";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import ListItemText from "@mui/material/ListItemText";
-import Student from "../../model/Student";
+import Student from "../../../model/Student";
 import {useNavigate} from "react-router-dom";
-import Class from "../../model/Class";
-import {classService, studentWeekIssueService} from "../../service/provider/ServiceProvider";
+import Class from "../../../model/Class";
+import {classService, studentWeekIssueService} from "../../../service/provider/ServiceProvider";
 import IconButton from "@mui/material/IconButton";
-import WeekId from "../../model/identifier/WeekId";
-import StudentWeekIssue from "../../model/StudentWeekIssue";
-import StudentId from "../../model/identifier/StudentId";
+import WeekId from "../../../model/identifier/WeekId";
+import StudentWeekIssue from "../../../model/StudentWeekIssue";
+import StudentId from "../../../model/identifier/StudentId";
 import AverageIssueChart from "./component/AverageIssueChart";
 import {ResponsiveContainer} from "recharts";
 import Box from "@mui/material/Box";
@@ -40,6 +39,7 @@ const ClassStudentsInfo: React.FC<ClassStudentsInfoProps> = ({
     useEffect(() => {
         (async () => {
             const studentList: Array<Student> = await classService.getAllClassStudent(classObject.id);
+            if (studentList.length === 0) return;
             const studentIdList: Array<StudentId> = studentList.map((student: Student) => student.id);
             const averageIssueScoreList: Array<AverageIssueScoreInterface> = [];
             let weekId: WeekId = WeekId.thisWeek();
@@ -130,7 +130,12 @@ const ClassStudentsInfo: React.FC<ClassStudentsInfoProps> = ({
                     }
                 )}
             </List>
-            <Paper sx={{ width: { xs: screenWidthNumeric - 100, md: screenWidthNumeric - 500 } }}>
+            <Paper
+                sx={{
+                    width: { xs: screenWidthNumeric - 100, md: screenWidthNumeric - 500 },
+                    p: "20px 0"
+                }}
+            >
                 <ResponsiveContainer width='100%'>
                     <AverageIssueChart
                         data={averageIssueScoreList}

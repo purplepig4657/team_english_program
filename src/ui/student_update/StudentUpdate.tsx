@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Student from "../../model/Student";
 import {useLocation} from "react-router";
 import ClassId from "../../model/identifier/ClassId";
@@ -17,11 +17,9 @@ import {
 import FlexContainer from "../../components/FlexContainer";
 import Box from "@mui/material/Box";
 import NavigationIcon from "@material-ui/icons/Navigation";
-
-
-// interface StudentUpdateProps {
-//     updatingStudent: Student | null;  // If null, it is creating student.
-// }
+import Class from "../../model/Class";
+import {classService, studentService} from "../../service/provider/ServiceProvider";
+import {useNavigate} from "react-router-dom";
 
 
 const ITEM_HEIGHT = 48;
@@ -36,52 +34,82 @@ const MenuProps = {
     },
 };
 
-const names = [
-    'Oliver Hansen',
-    'Van Henry',
-    'April Tucker',
-    'Ralph Hubbard',
-    'Omar Alexander',
-    'Carlos Abbott',
-    'Miriam Wagner',
-    'Bradley Wilkerson',
-    'Virginia Andrews',
-    'Kelly Snyder',
-];
-
-
 
 const StudentUpdate: React.FC = () => {
+    const [selectedClassIds, setSelectedClassIds] = React.useState<string[]>([]);
+    const [studentName, setStudentName] = React.useState<string>("");
+    const [classList, setClassList] = React.useState<Array<Class>>([]);
+
     const location = useLocation();
+    const navigate = useNavigate();
     const studentObject = location.state.student;
 
     const mode: string = studentObject === null ? 'create' : 'update';
 
+    let targetStudent: Student;
 
-    const updateStudent = () => {
+    if (mode === 'update') {
         const classIdList: Array<ClassId> = studentObject._classIdList.map(
             (classId: { _id: any }) => new ClassId(classId._id)
         );
-        const student: Student = new Student(
+        targetStudent = new Student(
             new StudentId(studentObject._id._id),
             classIdList,
             studentObject._name,
-            studentObject._createdAt
+            studentObject._createdAt,
+            studentObject._updatedAt
         );
+    }
+
+    useEffect(() => {
+        (async () => {
+            const classList: Array<Class> = await classService.getAllClass();
+            setClassList(classList);
+        })();
+
+        if (mode === 'update') {
+            const classIdStringList: Array<string> = targetStudent.classIdList.map((classId: ClassId) => classId.id);
+            setStudentName(targetStudent.name);
+            setSelectedClassIds(classIdStringList);
+        }
+    }, []);
+
+
+    const updateStudent = async () => {
+        const newClassList: Array<ClassId> = selectedClassIds.map((classId: string) => new ClassId(classId));
+        targetStudent.changeName(studentName);
+        targetStudent.changeClassIdList(newClassList);
+        const isSuccess: boolean = await studentService.updateStudentBothStoreAndCache(targetStudent);
+        if (isSuccess) navigate(-1);
     };
 
-    const createStudent = () => {
-        console.log(personName);
+    const createStudent = async () => {
+        if (studentName === "" || studentName === null || studentName === undefined) return;
+
+        const classIdList: Array<ClassId> = selectedClassIds.map((id: string) => new ClassId(id));
+
+        const newStudent: Student = new Student(
+            new StudentId("none"),
+            classIdList,
+            studentName,
+            new Date(),
+            new Date()
+        );
+
+        const student: Student = await studentService.createStudent(newStudent);
+
+        navigate(-1);
     };
 
-
-    const [personName, setPersonName] = React.useState<string[]>([]);
-
-    const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+    const handleSelectChange = (event: SelectChangeEvent<typeof selectedClassIds>) => {
         const {
             target: { value },
         } = event;
-        setPersonName(typeof value === 'string' ? value.split(',') : value);
+        setSelectedClassIds(typeof value === 'string' ? value.split(',') : value);
+    };
+
+    const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setStudentName(event.target.value);
     };
 
     return <Scaffold>
@@ -104,11 +132,12 @@ const StudentUpdate: React.FC = () => {
             </Typography>
             <TextField
                 required
-                id="standard-required"
                 label="Required"
-                defaultValue=""
+                // defaultValue=""
+                value={studentName}
                 placeholder="student name"
                 variant="standard"
+                onChange={handleTextFieldChange}
                 size="small"
                 sx={{ width: "200px" }}
             />
@@ -123,12 +152,12 @@ const StudentUpdate: React.FC = () => {
                 Select class
             </Typography>
             <FormControl sx={{ m: 1, width: 300 }}>
-                <InputLabel>Chip</InputLabel>
+                <InputLabel>Choose class</InputLabel>
                 <Select
                     multiple
-                    value={personName}
-                    onChange={handleChange}
-                    input={<OutlinedInput label="Chip" />}
+                    value={selectedClassIds}
+                    onChange={handleSelectChange}
+                    input={<OutlinedInput label="Choose class" />}
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {selected.map((value) => (
@@ -138,19 +167,19 @@ const StudentUpdate: React.FC = () => {
                     )}
                     MenuProps={MenuProps}
                 >
-                    {names.map((name) => (
+                    {classList.map((classObject: Class) => (
                         <MenuItem
-                            key={name}
-                            value={name}
+                            key={classObject.idString}
+                            value={classObject.idString}
                         >
-                            {name}
+                            {classObject.idString}
                         </MenuItem>
                     ))}
                 </Select>
             </FormControl>
         </FlexContainer>
         <FlexContainer width="100%" justifyContent="flex-end" {...{ padding: "20px" }}>
-            <Fab variant="extended" color="primary" onClick={createStudent}>
+            <Fab variant="extended" color="primary" onClick={mode === 'create' ? createStudent : updateStudent}>
                 <NavigationIcon />
                 Submit
             </Fab>

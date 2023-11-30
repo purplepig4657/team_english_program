@@ -1,6 +1,7 @@
 import StudentIssueRepository from "../repository/interface/StudentIssueRepository";
 import StudentIssue from "../model/StudentIssue";
 import StudentIssueRepositoryImpl from "../repository/firebase/StudentIssueRepositoryImpl";
+import StudentIssueId from "../model/identifier/StudentIssueId";
 
 export default class StudentIssueCache {
 
@@ -23,6 +24,13 @@ export default class StudentIssueCache {
             this._studentIssueListCache = await this._studentIssueRepository.getAll();
         }
         console.log("cache hit: " + this._studentIssueListCache);
+        return this._studentIssueListCache;
+    }
+
+    public removeStudentIssueCacheById(studentIssueId: StudentIssueId): Array<StudentIssue> {
+        this._studentIssueListCache = this._studentIssueListCache.filter(
+            (studentIssue: StudentIssue) => studentIssue.idString !== studentIssueId.id
+        );
         return this._studentIssueListCache;
     }
 

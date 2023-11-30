@@ -28,6 +28,7 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     async get(id: ClassId): Promise<Class | null> {
+        console.log("ClassRepositoryImpl read");
         const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
         const classSnap: DocumentSnapshot<Class> = await getDoc(classRef);
         if (classSnap.exists()) return classSnap.data();
@@ -35,6 +36,7 @@ export default class ClassRepositoryImpl implements ClassRepository {
     }
 
     async getAll(): Promise<Array<Class>> {
+        console.log("ClassRepositoryImpl read");
         const classListSnap: QuerySnapshot = await getDocs(collection(db, CLASS_COLLECTION));
         const result: Array<Class> = new Array<Class>();
         classListSnap.forEach((classDBModel: QueryDocumentSnapshot) => {
@@ -56,19 +58,19 @@ export default class ClassRepositoryImpl implements ClassRepository {
         return deleteDoc(classRef).then(() => true).catch(() => false);
     }
 
-    async addStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
-        return updateDoc(classRef, {
-            studentIdList: arrayUnion(studentId.id)
-        }).then(() => true).catch(() => false);
-    }
-
-    async removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
-        const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
-        return updateDoc(classRef, {
-            studentIdList: arrayRemove(studentId.id)
-        }).then(() => true).catch(() => false);
-    }
+    // async addStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
+    //     const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
+    //     return updateDoc(classRef, {
+    //         studentIdList: arrayUnion(studentId.id)
+    //     }).then(() => true).catch(() => false);
+    // }
+    //
+    // async removeStudentId(id: ClassId, studentId: StudentId): Promise<boolean> {
+    //     const classRef = doc(collection(db, CLASS_COLLECTION), id.id).withConverter(classConverter);
+    //     return updateDoc(classRef, {
+    //         studentIdList: arrayRemove(studentId.id)
+    //     }).then(() => true).catch(() => false);
+    // }
 
     async addLecture(id: ClassId, lecture: Lecture): Promise<Lecture> {
         const classRef = doc(collection(db, CLASS_COLLECTION), id.id);
