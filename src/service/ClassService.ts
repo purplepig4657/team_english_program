@@ -87,17 +87,21 @@ export default class ClassService {
         if (targetLecture === null) return false;
         const studentLectureIssueList: Array<StudentLectureIssue> =
             await studentLectureIssueService.getAllStudentLectureIssueByLectureId(id, lectureId);
-        const promiseList: Promise<boolean>[] = [];
+        // const switchPromiseList: Promise<boolean>[] = [];
+        const lectureIssuePromiseList: Promise<boolean>[] = [];
         const issueList: Array<any> = ['lateness', 'absence', 'attitude', 'scoreIssue'];
         for (let studentLectureIssue of studentLectureIssueList) {
+            console.log(studentLectureIssue);
             for (let issueString of issueList) {
-                if (!this.checkIssue(studentLectureIssue, issueString))
-                    promiseList.push(studentLectureIssueService.switchIndicator(
-                        id, targetLecture, studentLectureIssue, issueString));
+                console.log(issueString);
+                if (this.checkIssue(studentLectureIssue, issueString))
+                    await studentLectureIssueService.switchIndicator(
+                        id, targetLecture, studentLectureIssue, issueString);
             }
-            promiseList.push(this.removeStudentLectureIssue(id, studentLectureIssue.id));
+            lectureIssuePromiseList.push(this.removeStudentLectureIssue(id, studentLectureIssue.id));
         }
-        await Promise.all(promiseList);
+        // await Promise.all(switchPromiseList);
+        await Promise.all(lectureIssuePromiseList);
         return await this._classRepository.removeLecture(id, lectureId);
     }
 

@@ -22,9 +22,7 @@ const IssuedStudentTable: React.FC<IssuedStudentTableProps> = ({
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {studentAndScoreList.map((studentAndScore) => {
-                        const student: Student = studentAndScore[0];
-                        const studentIssue: StudentIssue = studentAndScore[1];
+                    {studentAndScoreList.map(([student, studentIssue]) => {
                         return (
                             <TableRow
                                 key={student.id.id}

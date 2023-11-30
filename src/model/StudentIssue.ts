@@ -8,7 +8,13 @@ import {
 
 import StudentIssueId from "./identifier/StudentIssueId";
 import StudentId from "./identifier/StudentId";
-import {ISSUE_THRESHOLD} from "../constants/GlobalConstants";
+import {
+    ABSENCE_WEIGHT,
+    ATTITUDE_WEIGHT, CONSULTATION_WEIGHT,
+    ISSUE_THRESHOLD,
+    LATENESS_WEIGHT,
+    SCORE_ISSUE_WEIGHT
+} from "../constants/GlobalWeight";
 
 export default class StudentIssue {
     private readonly _id: StudentIssueId;
@@ -45,8 +51,12 @@ export default class StudentIssue {
     }
 
     public getIssueScore(): number {
-        // TODO: Revise this.
-        return this.lateness + this.absence + this.attitude + this.scoreIssue - this.consultation;
+        return Math.max(
+            (this.lateness * LATENESS_WEIGHT) +
+            (this.absence * ABSENCE_WEIGHT) +
+            (this.attitude * ATTITUDE_WEIGHT) +
+            (this.scoreIssue * SCORE_ISSUE_WEIGHT) -
+            (this.consultation * CONSULTATION_WEIGHT), 0);
     }
 
     public incrementLateness(): void {
@@ -79,6 +89,15 @@ export default class StudentIssue {
 
     public decrementScoreIssue(): void {
         this._scoreIssue -= 1;
+    }
+
+    public incrementConsultation(): void {
+        this._consultation += 1;
+    }
+
+    public decrementConsultation(): void {
+        if (this._consultation == 0) return;
+        this._consultation -= 1;
     }
 
     get id(): StudentId {

@@ -68,19 +68,19 @@ export default class StudentLectureIssue {
         this._scoreIssue = !this._scoreIssue;
     }
 
-    public setLatenessComment(content: string): void {
+    public setLatenessComment(content: string | null): void {
         this._latenessComment = content;
     }
 
-    public setAbsenceComment(content: string): void {
+    public setAbsenceComment(content: string | null): void {
         this._absenceComment = content;
     }
 
-    public setAttitudeComment(content: string): void {
+    public setAttitudeComment(content: string | null): void {
         this._attitudeComment = content;
     }
 
-    public setScoreIssueComment(content: string): void {
+    public setScoreIssueComment(content: string | null): void {
         this._scoreIssueComment = content;
     }
 

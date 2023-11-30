@@ -1,23 +1,21 @@
 import React, {useEffect, useState} from "react";
 import Scaffold from "../../components/Scaffold";
-import {Grid, Paper, Typography} from "@mui/material";
+import {Fab, Grid, Paper, Typography} from "@mui/material";
 import Student from "../../model/Student";
 import {useLocation} from "react-router";
 import FlexContainer from "../../components/FlexContainer";
 import Box from "@mui/material/Box";
 import WeekId from "../../model/identifier/WeekId";
-import {
-    classService, lectureService,
-    studentLectureIssueService,
-    studentWeekIssueService
-} from "../../service/provider/ServiceProvider";
+import {studentIssueService, studentWeekIssueService} from "../../service/provider/ServiceProvider";
 import StudentId from "../../model/identifier/StudentId";
 import StudentWeekIssue from "../../model/StudentWeekIssue";
 import ClassId from "../../model/identifier/ClassId";
-import Lecture from "../../model/Lecture";
-import LectureId from "../../model/identifier/LectureId";
 import IssueChart from "./component/IssueChart";
 import {ResponsiveContainer} from "recharts";
+import StudentIssue from "../../model/StudentIssue";
+import AddIcon from "@material-ui/icons/Add";
+import MinusIcon from "@material-ui/icons/Remove";
+import StudentIssueId from "../../model/identifier/StudentIssueId";
 
 
 interface StudentInfoProps {
@@ -52,6 +50,9 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
         scoreIssue: []
     });
     const [thisWeekIssue, setThisWeekIssue] = React.useState<StudentWeekIssue | null>(null);
+    const [studentIssue, setStudentIssue] = React.useState<StudentIssue | null>(null);
+    const [consultationCount, setConsultationCount] = React.useState<number>(0);
+    const [calculatedIssue, setCalculatedIssue] = React.useState<number>(0);
 
     const location = useLocation();
     const studentObject = location.state.student;
@@ -68,17 +69,6 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
 
     useEffect(() => {
         (async () => {
-            // await classService.addLecture(new ClassId("testClass2"), new Lecture(
-            //     new LectureId("none"),
-            //     student.classIdList[0],
-            //     WeekId.thisWeek(),
-            //     "lecture_name",
-            //     "teacher"
-            // ));
-            // const lecture = await lectureService.getLecture(student.classIdList[0], new LectureId("iQfxGrJerqqd0DXA7ZUM"));
-            // const lectureIssueList = await studentLectureIssueService.getAllStudentLectureIssueByLectureId(
-            //     student.classIdList[0], new LectureId("iQfxGrJerqqd0DXA7ZUM"));
-            // await studentLectureIssueService.switchIndicator(student.classIdList[0], lecture as Lecture, lectureIssueList[0], 'lateness')
             const data: IssueDataInterface = {
                 calculated: [],
                 lateness: [],
@@ -113,8 +103,17 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
             data.absense.reverse();
             data.attitude.reverse();
             data.scoreIssue.reverse();
+
+            const studentIssue: StudentIssue | null = await studentIssueService.getStudentIssueByStudentId(student.id);
+
+            if (studentIssue !== null) {
+                setConsultationCount(studentIssue.consultation);
+                setCalculatedIssue(studentIssue.getIssueScore());
+            }
+
             setData(data);
             setThisWeekIssue(thisWeekIssueTmp);
+            setStudentIssue(studentIssue);
         })();
 
         const screenResize = () => {
@@ -131,6 +130,17 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
             window.removeEventListener("resize", screenResize);
         };
     }, [drawerWidth]);
+
+    const consultationClick = async (mode: 'plus' | 'minus') => {
+        if (studentIssue === null) return;
+        if (mode === 'plus') studentIssue.incrementConsultation();
+        else studentIssue.decrementConsultation();
+        const isSuccess = await studentIssueService.updateStudentIssue(studentIssue);
+        if (isSuccess) {
+            setConsultationCount(studentIssue.consultation);
+            setCalculatedIssue(studentIssue.getIssueScore());
+        }
+    };
 
     return <Scaffold>
         <FlexContainer alignItems={'center'}>
@@ -152,6 +162,14 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
                 {" / " + student.getClassIdListString()}
             </Typography>
         </FlexContainer>
+        <Typography
+            sx={{
+                m: "0 20px",
+                fontSize: { xs: '20px', sm: "25px" }
+            }}
+        >
+            {WeekId.thisWeek().id}
+        </Typography>
         <FlexContainer flexDirection='column' {...{ padding: "20px" }}>
             <Box sx={{ flexGrow: 1 }}>
                 <Grid container spacing={2}>
@@ -243,7 +261,30 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
                     </ResponsiveContainer>
                 </Box>
             </FlexContainer>
-
+            <Paper sx={{ margin: "30px", padding: "20px", minHeight: "200px" }}>
+                <FlexContainer>
+                    <FlexContainer flexDirection="column">
+                        <Typography sx={{fontSize: { xs: '15px', sm: "12px", md: "20px" }}}>
+                            Consultation Count
+                        </Typography>
+                        <Typography sx={{fontSize: { xs: '40px', sm: "50px", md: "60px" }, fontWeight: 'bold'}}>
+                            {consultationCount}
+                        </Typography>
+                        <Typography sx={{fontSize: { xs: '15px', sm: "12px", md: "20px" }}}>
+                            Calculated with Consultation
+                        </Typography>
+                        <Typography sx={{fontSize: { xs: '40px', sm: "50px", md: "60px" }, fontWeight: 'bold'}}>
+                            {calculatedIssue}
+                        </Typography>
+                    </FlexContainer>
+                    <Fab color="primary" sx={{mr: 2}} onClick={() => consultationClick('plus')}>
+                        <AddIcon />
+                    </Fab>
+                    <Fab color="primary" onClick={() => consultationClick('minus')}>
+                        <MinusIcon />
+                    </Fab>
+                </FlexContainer>
+            </Paper>
         </FlexContainer>
     </Scaffold>;
 };

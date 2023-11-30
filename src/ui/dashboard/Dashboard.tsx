@@ -27,25 +27,8 @@ const Dashboard: React.FC<DashboardProps> = ({
         (async () => {
             const _studentService = studentService;
             const _studentIssueService = studentIssueService;
-            // const student = studentService.createStudent(new Student(
-            //     new StudentId("none"),
-            //     [new ClassId("class1")],
-            //     "hello", new Date(), new Date()),
-            // );
-            // const classService = ClassService.getInstance();
-            // await classService.createClass(new Class(new ClassId("class1"), []));
             const issuedStudentList = await studentIssueService.getAllIssueStudentList();
             setIssuedStudentList(issuedStudentList);
-            // studentService.addStudentWeekIssue(
-            //     new StudentId("6s2S62Kw4w0cvsVdx5mx"),
-            //     new StudentWeekIssue(
-            //         new StudentWeekIssueId("none"),
-            //         new StudentId("6s2S62Kw4w0cvsVdx5mx"),
-            //         WeekId.thisWeek(),
-            //         0, 0, 0, 0
-            //     )
-            // );
-            // console.log(student);
         })();
     }, []);
 

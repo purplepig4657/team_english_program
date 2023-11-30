@@ -65,7 +65,6 @@ const ClassStudentsInfo: React.FC<ClassStudentsInfoProps> = ({
             averageIssueScoreList.sort(
                 (a, b) => a.name.localeCompare(b.name)
             );
-            averageIssueScoreList.reverse();
 
             setStudentList(studentList);
             setAverageIssueScoreList(averageIssueScoreList);
@@ -99,7 +98,14 @@ const ClassStudentsInfo: React.FC<ClassStudentsInfoProps> = ({
                 flexWrap: 'wrap'
             }}
         >
-            <List component={Paper} sx={{ width: '100%', maxWidth: 360, p: "10px", mb: { xs: "30px", md: 0 } }}>
+            <List component={Paper}
+                  sx={{
+                      width: '100%',
+                      maxWidth: 360,
+                      p: "10px",
+                      mb: { xs: "30px", md: 0 }
+                }}
+            >
                 <Typography
                     sx={{
                         m: "20px",

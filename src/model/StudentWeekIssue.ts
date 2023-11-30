@@ -8,6 +8,7 @@ import {
 import StudentWeekIssueId from "./identifier/StudentWeekIssueId";
 import WeekId from "./identifier/WeekId";
 import StudentId from "./identifier/StudentId";
+import {ABSENCE_WEIGHT, ATTITUDE_WEIGHT, LATENESS_WEIGHT, SCORE_ISSUE_WEIGHT} from "../constants/GlobalWeight";
 
 
 export default class StudentWeekIssue {
@@ -38,8 +39,10 @@ export default class StudentWeekIssue {
     }
 
     public getIssueScore(): number {
-        // TODO: Revise this.
-        return this.lateness + this.absence + this.attitude + this.scoreIssue;
+        return (this.lateness * LATENESS_WEIGHT) +
+            (this.absence * ABSENCE_WEIGHT) +
+            (this.attitude * ATTITUDE_WEIGHT) +
+            (this.scoreIssue * SCORE_ISSUE_WEIGHT);
     }
 
     public incrementLateness(): void {

@@ -7,7 +7,6 @@ import StudentIssue from "../model/StudentIssue";
 import StudentIssueId from "../model/identifier/StudentIssueId";
 import ClassId from "../model/identifier/ClassId";
 import {studentCache, studentIssueService} from "./provider/ServiceProvider";
-import studentUpdate from "../ui/student_update/StudentUpdate";
 
 export default class StudentService {
 
@@ -66,7 +65,11 @@ export default class StudentService {
         return await this._studentRepository.getAllByIdList(idList);
     }
 
-
+    public async getAllStudentByIdListWithCache(idList: Array<StudentId>): Promise<Array<Student>> {
+        const studentList: Array<Student> = await this.getAllStudent();
+        const idStringList: Array<string> = idList.map((studentId: StudentId) => studentId.id);
+        return studentList.filter((student: Student) => idStringList.includes(student.idString));
+    }
 
     public async getAllStudent(): Promise<Array<Student>> {
         return await studentCache.getCachedStudentList();

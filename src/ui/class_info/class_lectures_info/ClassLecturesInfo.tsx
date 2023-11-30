@@ -3,9 +3,10 @@ import Box from "@mui/material/Box";
 import {Tab, Tabs} from "@mui/material";
 import LectureTab from "./component/LectureTab";
 import Lecture from "../../../model/Lecture";
-import {lectureService} from "../../../service/provider/ServiceProvider";
+import {classService, lectureService} from "../../../service/provider/ServiceProvider";
 import ClassId from "../../../model/identifier/ClassId";
 import WeekId from "../../../model/identifier/WeekId";
+import LectureId from "../../../model/identifier/LectureId";
 
 
 interface ClassLecturesInfoProps {
@@ -33,12 +34,21 @@ const ClassLecturesInfo: React.FC<ClassLecturesInfoProps> = ({
         })();
     }, [weekId]);
 
+    const removeLecture = async (targetLectureId: LectureId) => {
+        const isSuccess = await classService.removeLecture(classId, targetLectureId);
+        if (isSuccess) {
+            const updatedLectureList = lectureList.filter((lecture: Lecture) => lecture.idString !== targetLectureId.id);
+            setLectureList(updatedLectureList);
+        }
+    }
+
     return <>
         <Box sx={{ width: "100%", minHeight: "600px", p: "0 30px" }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs
                     value={tabValue}
                     onChange={handleChange}
+                    variant="scrollable"
                     scrollButtons
                     allowScrollButtonsMobile
                 >
@@ -57,6 +67,7 @@ const ClassLecturesInfo: React.FC<ClassLecturesInfoProps> = ({
                         lecture={lecture}
                         index={index}
                         value={tabValue}
+                        removeLectureCallback={removeLecture}
                     />
                 })
             }
