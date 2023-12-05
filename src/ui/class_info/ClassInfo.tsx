@@ -27,7 +27,8 @@ const ClassInfo: React.FC<ClassInfoProps> = ({
     const classInfo = location.state.classObject;
 
     const classObject: Class = new Class(
-        new ClassId(classInfo._id._id)
+        new ClassId(classInfo._id._id),
+        classInfo._disabled
     );
 
     const weekList: Array<WeekId> = [];

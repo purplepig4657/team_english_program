@@ -10,6 +10,7 @@ import {
     setGlobalIssueThreshold, setGlobalLatenessWeight, setGlobalScoreIssueWeight
 } from "../../constants/GlobalWeight";
 import NavigationIcon from "@material-ui/icons/Navigation";
+import {useNavigate} from "react-router-dom";
 
 const WeightManage = (): JSX.Element => {
     const [issueThreshold, setIssueThreshold] = useState<number>(0);
@@ -18,6 +19,8 @@ const WeightManage = (): JSX.Element => {
     const [attitudeWeight, setAttitudeWeight] = useState<number>(1);
     const [scoreIssueWeight, setScoreIssueWeight] = useState<number>(1);
     const [consultationWeight, setConsultationWeight] = useState<number>(1);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         setIssueThreshold(ISSUE_THRESHOLD);
@@ -59,6 +62,7 @@ const WeightManage = (): JSX.Element => {
         setGlobalAttitudeWeight(attitudeWeight);
         setGlobalScoreIssueWeight(scoreIssueWeight);
         setGlobalConsultationWeight(consultationWeight);
+        navigate(-1);
     };
 
 

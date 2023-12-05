@@ -82,7 +82,7 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
             for (let i = 0; i < 5; i++) {
                 const weekIssue: StudentWeekIssue | null =
                     await studentWeekIssueService.getStudentWeekIssueByWeekId(student.id, weekId);
-                if (thisWeekIssueTmp === null) thisWeekIssueTmp = weekIssue;
+                if (i === 0) thisWeekIssueTmp = weekIssue;
                 if (weekIssue === null) {
                     data.calculated.push({ name: 'None', issueScore: 0 });
                     data.lateness.push({ name: 'None', issueScore: 0 });

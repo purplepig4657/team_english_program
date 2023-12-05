@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Fab, TextField, Typography} from "@mui/material";
 import Scaffold from "../../components/Scaffold";
 import FlexContainer from "../../components/FlexContainer";
@@ -7,21 +7,48 @@ import {useNavigate} from "react-router-dom";
 import Class from "../../model/Class";
 import ClassId from "../../model/identifier/ClassId";
 import {classService} from "../../service/provider/ServiceProvider";
+import {useLocation} from "react-router";
 
 const ClassUpdate: React.FC = () => {
     const [className, setClassName] = useState<string>("");
 
+    const location = useLocation();
     const navigate = useNavigate();
+    const classObject = location.state.classObject;
+
+    const mode: string = classObject === null ? 'create' : 'update';
+
+    let targetClass: Class;
+
+    if (mode === 'update') {
+        targetClass = new Class(
+            new ClassId(classObject._id._id),
+            classObject._disabled
+        );
+    }
+
+    useEffect(() => {
+        if (mode === 'update') setClassName(targetClass.idString);
+    }, []);
 
     const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setClassName(event.target.value);
-    }
+    };
+
+    const updateClass = async () => {
+        targetClass.changeClassId(new ClassId(className));
+        const isSuccess: boolean = await classService.updateClass(classObject);
+        if (isSuccess) navigate(-1);
+    };
 
     const createClass = async () => {
-        const newClass: Class = new Class(new ClassId(className));
-        const classObject: Class | null = await classService.createClass(newClass);
-        if (classObject !== null) navigate(-1);
-    }
+        const newClass: Class = new Class(
+            new ClassId(className),
+            false
+        );
+        const createdClass: Class | null = await classService.createClass(newClass);
+        if (createdClass !== null) navigate(-1);
+    };
 
     return <Scaffold>
         <Typography
@@ -53,7 +80,7 @@ const ClassUpdate: React.FC = () => {
             />
         </FlexContainer>
         <FlexContainer width="100%" justifyContent="flex-end" {...{ padding: "20px" }}>
-            <Fab variant="extended" color="primary" onClick={createClass}>
+            <Fab variant="extended" color="primary" onClick={mode === 'create' ? createClass : updateClass}>
                 <NavigationIcon />
                 Submit
             </Fab>

@@ -3,15 +3,23 @@ import React, {useEffect, useState} from "react";
 import Class from "../../../model/Class";
 import {useNavigate} from "react-router-dom";
 import {classService} from "../../../service/provider/ServiceProvider";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
+import FlexContainer from "../../../components/FlexContainer";
 
 
 interface ClassCardProps {
     classObject: Class;
+    editMode: boolean;
+    classDisableCallback: (disabledClass: Class) => void;
 }
 
 
 const ClassCard: React.FC<ClassCardProps> = ({
-    classObject
+    classObject,
+    editMode,
+    classDisableCallback
 }) => {
     const [studentCount, setStudentCount] = useState<number>(0);
 
@@ -21,10 +29,20 @@ const ClassCard: React.FC<ClassCardProps> = ({
         (async () => {
             setStudentCount((await classService.getAllClassStudent(classObject.id)).length)
         })();
-    }, []);
+    }, [editMode]);
 
     const classInfoClick = (classObject: Class) => {
         navigate("/class_info", { state: { classObject: classObject } })
+    }
+
+    const classUpdateClick = (classObject: Class) => {
+        navigate("/class_update", { state: { classObject: classObject } })
+    }
+
+    const disableClass = async (classObject: Class) => {
+        classObject.disableClass();
+        await classService.updateClass(classObject);
+        classDisableCallback(classObject);
     }
 
 
@@ -43,6 +61,20 @@ const ClassCard: React.FC<ClassCardProps> = ({
             </CardContent>
             <CardActions>
                 <Button size="small" onClick={() => classInfoClick(classObject)}>Enter</Button>
+                {false && <IconButton
+                    size="small"
+                    onClick={() => classUpdateClick(classObject)}
+                    sx={{ mr: 1 }}
+                >
+                    <EditIcon />
+                </IconButton>}  {/* disable edit button now */}
+                {editMode && <IconButton
+                    size="small"
+                    color="warning"
+                    onClick={() => disableClass(classObject)}
+                >
+                    <DeleteIcon />
+                </IconButton>}
             </CardActions>
         </Card>
     );

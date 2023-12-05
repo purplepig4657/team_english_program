@@ -3,7 +3,6 @@ import ClassRepositoryImpl from "../repository/firebase/ClassRepositoryImpl";
 import Class from "../model/Class";
 import ClassId from "../model/identifier/ClassId";
 import Student from "../model/Student";
-import StudentId from "../model/identifier/StudentId";
 import {lectureService, studentLectureIssueService, studentService} from "./provider/ServiceProvider";
 import Lecture from "../model/Lecture";
 import LectureId from "../model/identifier/LectureId";

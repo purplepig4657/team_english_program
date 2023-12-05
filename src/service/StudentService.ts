@@ -96,7 +96,7 @@ export default class StudentService {
         //     (classId) => [classService.removeStudentId(classId, targetStudent.id)]
         // ));
         // TODO: Transaction 처리
-        await studentIssueService.getStudentIssueByStudentId(studentId);
+        await studentIssueService.deleteStudentIssueByStudentId(studentId);
         return await this._studentRepository.delete(studentId);
     }
 
