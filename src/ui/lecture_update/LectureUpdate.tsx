@@ -20,6 +20,7 @@ const LectureUpdate: React.FC = () => {
     const navigate = useNavigate();
 
     const targetClassId: ClassId = new ClassId(location.state.classId._id);
+    const targetClassName: string = location.state.className;
     const targetWeekId: WeekId = new WeekId(location.state.weekId._id);
 
     const handleLectureNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,6 +32,9 @@ const LectureUpdate: React.FC = () => {
     }
 
     const createLecture = async () => {
+        if (lectureName === "" || lectureName === null || lectureName === undefined) return;
+        if (teacherName === "" || teacherName === null || teacherName === undefined) return;
+
         const newLecture: Lecture = new Lecture(
             new LectureId("none"),
             targetClassId,
@@ -57,7 +61,7 @@ const LectureUpdate: React.FC = () => {
                 fontSize: { xs: '15px', sm: "25px" }
             }}
         >
-            {`class: ${targetClassId.id} | week: ${targetWeekId.id}`}
+            {`class: ${targetClassName} | week: ${targetWeekId.formedId}`}
         </Typography>
         <FlexContainer flexWrap='wrap' {...{marginLeft: "20px"}}>
             <Typography

@@ -157,21 +157,21 @@ const StudentListTable: React.FC<StudentListTableProps> = ({
                                             component="th"
                                             scope="row"
                                         >
-                                            {`${student.name}`}
+                                            {`${student.name} (${student.englishName})`}
                                         </TableCell>
                                         <TableCell
                                             onClick={(event) => studentInfoClick(student)}
                                             align="left"
                                         >
-                                            {student.getClassIdListString()}
+                                            {student.getClassNameListString()}
                                         </TableCell>
                                         <TableCell
                                             onClick={(event) => studentInfoClick(student)}
                                             align="right"
                                         >
-                                            {student.updatedAt.getFullYear() +
-                                            "-" + (student.updatedAt.getMonth() + 1) +
-                                            "-" + student.updatedAt.getDate()}
+                                            {student.createdAt.getFullYear() +
+                                            "-" + (student.createdAt.getMonth() + 1) +
+                                            "-" + student.createdAt.getDate()}
                                         </TableCell>
                                         {editToggle &&
                                             <TableCell align="right">

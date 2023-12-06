@@ -26,6 +26,14 @@ export default class StudentLectureIssueService {
         return await this._studentLectureIssueRepository.getAllByLectureId(classId, lectureId);
     }
 
+    public async getAllStudentLectureIssueByLectureIdAndStudentId(
+        classId: ClassId,
+        lectureId: LectureId,
+        studentId: StudentId
+    ): Promise<Array<StudentLectureIssue>> {
+        return await this._studentLectureIssueRepository.getAllByLectureIdAndStudentId(classId, lectureId, studentId);
+    }
+
     public async updateStudentLectureIssue(
         classId: ClassId,
         updatedStudentLectureIssue: StudentLectureIssue

@@ -32,27 +32,33 @@ const WeightManage = (): JSX.Element => {
     }, []);
 
     const handleIssueThresholdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setIssueThreshold(Number(event.target.value));
+        const numericValue = event.target.value.replace(/[^0-9]/g, '');
+        setIssueThreshold(Number(numericValue));
     };
 
     const handleLatenessWeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setLatenessWeight(Number(event.target.value));
+        const numericValue = event.target.value.replace(/[^0-9]/g, '');
+        setLatenessWeight(Number(numericValue));
     };
 
     const handleAbsenceWeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAbsenceWeight(Number(event.target.value));
+        const numericValue = event.target.value.replace(/[^0-9]/g, '');
+        setAbsenceWeight(Number(numericValue));
     };
 
     const handleAttitudeWeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAttitudeWeight(Number(event.target.value));
+        const numericValue = event.target.value.replace(/[^0-9]/g, '');
+        setAttitudeWeight(Number(numericValue));
     };
 
     const handleScoreIssueWeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setScoreIssueWeight(Number(event.target.value));
+        const numericValue = event.target.value.replace(/[^0-9]/g, '');
+        setScoreIssueWeight(Number(numericValue));
     };
 
     const handleConsultationWeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setConsultationWeight(Number(event.target.value));
+        const numericValue = event.target.value.replace(/[^0-9]/g, '');
+        setConsultationWeight(Number(numericValue));
     };
 
     const submitChanges = () => {

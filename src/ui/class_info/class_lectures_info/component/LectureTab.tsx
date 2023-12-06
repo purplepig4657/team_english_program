@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import Lecture from "../../../../model/Lecture";
 import StudentLectureIssue from "../../../../model/StudentLectureIssue";
-import {classService, studentLectureIssueService, studentService} from "../../../../service/provider/ServiceProvider";
+import {studentLectureIssueService, studentService} from "../../../../service/provider/ServiceProvider";
 import ClassId from "../../../../model/identifier/ClassId";
 import FlexContainer from "../../../../components/FlexContainer";
 import Student from "../../../../model/Student";
@@ -42,6 +42,7 @@ interface LectureIssueCommentDict {
         absence: string | null;
         attitude: string | null;
         scoreIssue: string | null;
+        good: string | null;
     };
 }
 
@@ -80,13 +81,14 @@ const LectureTab: React.FC<LectureTabProps> = ({
                         lateness: lectureIssue.lateness,
                         absence: lectureIssue.absence,
                         attitude: lectureIssue.attitude,
-                        scoreIssue: lectureIssue.scoreIssue
+                        scoreIssue: lectureIssue.scoreIssue,
                     };
                     lectureIssueCommentDict[student.idString] = {
                         lateness: lectureIssue.latenessComment,
                         absence: lectureIssue.absenceComment,
                         attitude: lectureIssue.attitudeComment,
-                        scoreIssue: lectureIssue.scoreIssueComment
+                        scoreIssue: lectureIssue.scoreIssueComment,
+                        good: lectureIssue.goodComment,
                     };
                 }
                 setLectureIssueDict(lectureIssueDict);
@@ -123,7 +125,7 @@ const LectureTab: React.FC<LectureTabProps> = ({
     const handleCommentChange = (
         event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
         studentIdString: string,
-        targetIssue: 'lateness' | 'absence' | 'attitude' | 'scoreIssue'
+        targetIssue: 'lateness' | 'absence' | 'attitude' | 'scoreIssue' | 'good'
     ) => {
         switch (targetIssue) {
             case "lateness":
@@ -157,6 +159,14 @@ const LectureTab: React.FC<LectureTabProps> = ({
                         scoreIssue: event.target.value,
                     }
                 }));
+                break;
+            case "good":
+                setLectureIssueCommentDict(prev => ({
+                    ...prev, [studentIdString]: {
+                        ...prev[studentIdString],
+                        good: event.target.value,
+                    }
+                }));
         }
     };
 
@@ -174,8 +184,13 @@ const LectureTab: React.FC<LectureTabProps> = ({
             if (lectureIssue.attitudeComment !== lectureIssueCommentDict[student.idString].attitude) {
                 lectureIssue.setAttitudeComment(lectureIssueCommentDict[student.idString].attitude);
                 isChanged = true;
-            }if (lectureIssue.scoreIssueComment !== lectureIssueCommentDict[student.idString].scoreIssue) {
+            }
+            if (lectureIssue.scoreIssueComment !== lectureIssueCommentDict[student.idString].scoreIssue) {
                 lectureIssue.setScoreIssueComment(lectureIssueCommentDict[student.idString].scoreIssue);
+                isChanged = true;
+            }
+            if (lectureIssue.goodComment !== lectureIssueCommentDict[student.idString].good) {
+                lectureIssue.setGoodComment(lectureIssueCommentDict[student.idString].good);
                 isChanged = true;
             }
             if (isChanged) await studentLectureIssueService.updateStudentLectureIssue(classId, lectureIssue);
@@ -225,8 +240,8 @@ const LectureTab: React.FC<LectureTabProps> = ({
                                         </Avatar>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary={student.name}
-                                        secondary={student.getClassIdListString()}
+                                        primary={`${student.name} (${student.englishName})`}
+                                        secondary={student.getClassNameListString()}
                                     />
                                     <Tooltip title="lateness">
                                         <IconButton
@@ -290,6 +305,13 @@ const LectureTab: React.FC<LectureTabProps> = ({
                                     >
                                         {`${student.name} - IssueComment`}
                                     </Typography>
+                                    <TextField
+                                        label="good point"
+                                        defaultValue={lectureIssueCommentDict[student.idString].good}
+                                        onChange={(event) => handleCommentChange(event, student.idString, 'good')}
+                                        sx={{ width: "100%", mb: "10px" }}
+                                        multiline
+                                    />
                                     {lectureIssueDict[student.idString].lateness && <TextField
                                         label="lateness"
                                         defaultValue={lectureIssueCommentDict[student.idString].lateness}

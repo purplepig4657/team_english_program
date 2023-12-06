@@ -23,12 +23,13 @@ const ClassUpdate: React.FC = () => {
     if (mode === 'update') {
         targetClass = new Class(
             new ClassId(classObject._id._id),
+            classObject._name,
             classObject._disabled
         );
     }
 
     useEffect(() => {
-        if (mode === 'update') setClassName(targetClass.idString);
+        if (mode === 'update') setClassName(targetClass.name);
     }, []);
 
     const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,14 +37,15 @@ const ClassUpdate: React.FC = () => {
     };
 
     const updateClass = async () => {
-        targetClass.changeClassId(new ClassId(className));
-        const isSuccess: boolean = await classService.updateClass(classObject);
+        targetClass.changeClassName(className);
+        const isSuccess: boolean = await classService.updateClass(targetClass);
         if (isSuccess) navigate(-1);
     };
 
     const createClass = async () => {
         const newClass: Class = new Class(
-            new ClassId(className),
+            new ClassId("none"),
+            className,
             false
         );
         const createdClass: Class | null = await classService.createClass(newClass);

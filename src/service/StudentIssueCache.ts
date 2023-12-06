@@ -17,7 +17,8 @@ export default class StudentIssueCache {
     }
 
     public async getCachedStudentList(): Promise<Array<StudentIssue>> {
-        const lastUpdatedStudentIssue: StudentIssue = await this._studentIssueRepository.getLastUpdatedStudentIssue();
+        const lastUpdatedStudentIssue: StudentIssue | undefined = await this._studentIssueRepository.getLastUpdatedStudentIssue();
+        if (lastUpdatedStudentIssue === undefined) return [];
         if (this._lastUpdatedStudentIssueDate === null || this._lastUpdatedStudentIssueDate < lastUpdatedStudentIssue.updateAt) {
             console.log("cache updated");
             this._lastUpdatedStudentIssueDate = lastUpdatedStudentIssue.updateAt;

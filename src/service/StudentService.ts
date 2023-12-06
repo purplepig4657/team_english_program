@@ -75,6 +75,13 @@ export default class StudentService {
         return await studentCache.getCachedStudentList();
     }
 
+    public async getAllTuitionIssueStudentList(): Promise<Array<Student>> {
+        const studentList: Array<Student> = await this.getAllStudent();
+        return studentList.filter(
+            (student: Student) => student.isTuitionIssueStudent()
+        );
+    }
+
     public async updateStudent(updatedStudent: Student): Promise<boolean> {
         updatedStudent.changeUpdatedAt();
         return await this._studentRepository.update(updatedStudent);

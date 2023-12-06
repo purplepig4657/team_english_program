@@ -1,6 +1,6 @@
 import {
     doc, getDoc, getDocs, updateDoc, collection, query, where,
-    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot
+    DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot, and
 } from "firebase/firestore";
 
 import { db } from "../../config/firebaseConfig";
@@ -14,6 +14,7 @@ import {
     STUDENT_LECTURE_ISSUE_COLLECTION
 } from "../common/firebaseCollectionNames";
 import LectureId from "../../model/identifier/LectureId";
+import StudentId from "../../model/identifier/StudentId";
 
 export default class StudentLectureIssueRepositoryImpl implements StudentLectureIssueRepository {
 
@@ -44,6 +45,26 @@ export default class StudentLectureIssueRepositoryImpl implements StudentLecture
         const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
         const studentLectureIssueRef = collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION);
         const q = query(studentLectureIssueRef, where("lectureId", "==", lectureId.id));
+        const studentLectureIssueListSnap: QuerySnapshot = await getDocs(q);
+        const result: Array<StudentLectureIssue> = new Array<StudentLectureIssue>();
+        studentLectureIssueListSnap.forEach((studentLectureIssueDBModel: QueryDocumentSnapshot) => {
+            result.push(studentLectureIssueConverter.fromFirestore(studentLectureIssueDBModel));
+        });
+        return result;
+    }
+
+    async getAllByLectureIdAndStudentId(
+        classId: ClassId,
+        lectureId: LectureId,
+        studentId: StudentId
+    ): Promise<Array<StudentLectureIssue>> {
+        console.log("StudentLectureIssueRepositoryImpl read");
+        const classRef = doc(collection(db, CLASS_COLLECTION), classId.id);
+        const studentLectureIssueRef = collection(classRef, STUDENT_LECTURE_ISSUE_COLLECTION);
+        const q = query(studentLectureIssueRef, and(
+            where("lectureId", "==", lectureId.id),
+            where("studentId", "==", studentId.id)
+        ));
         const studentLectureIssueListSnap: QuerySnapshot = await getDocs(q);
         const result: Array<StudentLectureIssue> = new Array<StudentLectureIssue>();
         studentLectureIssueListSnap.forEach((studentLectureIssueDBModel: QueryDocumentSnapshot) => {

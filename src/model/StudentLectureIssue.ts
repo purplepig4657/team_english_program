@@ -23,6 +23,7 @@ export default class StudentLectureIssue {
     private _absenceComment: string | null;
     private _attitudeComment: string | null;
     private _scoreIssueComment: string | null;
+    private _goodComment: string | null;
 
     constructor(
         id: StudentLectureIssueId,
@@ -36,7 +37,8 @@ export default class StudentLectureIssue {
         latenessComment: string | null,
         absenceComment: string | null,
         attitudeComment: string | null,
-        scoreIssueComment: string | null
+        scoreIssueComment: string | null,
+        goodComment: string | null,
     ) {
         this._id = id;
         this._classId = classId;
@@ -50,6 +52,7 @@ export default class StudentLectureIssue {
         this._absenceComment = absenceComment;
         this._attitudeComment = attitudeComment;
         this._scoreIssueComment = scoreIssueComment;
+        this._goodComment = goodComment;
     }
 
     public switchLateness(): void {
@@ -82,6 +85,10 @@ export default class StudentLectureIssue {
 
     public setScoreIssueComment(content: string | null): void {
         this._scoreIssueComment = content;
+    }
+
+    public setGoodComment(content: string | null): void {
+        this._goodComment = content;
     }
 
     // Getter
@@ -137,6 +144,10 @@ export default class StudentLectureIssue {
     get scoreIssueComment(): string | null {
         return this._scoreIssueComment;
     }
+
+    get goodComment(): string | null {
+        return this._goodComment;
+    }
 }
 
 
@@ -152,6 +163,7 @@ interface StudentLectureIssueDBModel extends DocumentData {
     absenceComment: string | null;
     attitudeComment: string | null;
     scoreIssueComment: string | null;
+    goodComment: string | null;
 }
 
 export const studentLectureIssueConverter: FirestoreDataConverter<StudentLectureIssue, StudentLectureIssueDBModel> = {
@@ -167,7 +179,8 @@ export const studentLectureIssueConverter: FirestoreDataConverter<StudentLecture
             latenessComment: studentLectureIssueData.latenessComment,
             absenceComment: studentLectureIssueData.absenceComment,
             attitudeComment: studentLectureIssueData.attitudeComment,
-            scoreIssueComment: studentLectureIssueData.scoreIssueComment
+            scoreIssueComment: studentLectureIssueData.scoreIssueComment,
+            goodComment: studentLectureIssueData.goodComment,
         };
     },
     fromFirestore: (
@@ -187,7 +200,8 @@ export const studentLectureIssueConverter: FirestoreDataConverter<StudentLecture
             data.latenessComment,
             data.absenceComment,
             data.attitudeComment,
-            data.scoreIssueComment
+            data.scoreIssueComment,
+            data.goodComment,
         );
     },
 };

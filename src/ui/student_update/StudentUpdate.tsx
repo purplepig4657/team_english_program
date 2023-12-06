@@ -20,6 +20,10 @@ import NavigationIcon from "@material-ui/icons/Navigation";
 import Class from "../../model/Class";
 import {classService, studentService} from "../../service/provider/ServiceProvider";
 import {useNavigate} from "react-router-dom";
+import {DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {DemoContainer} from "@mui/x-date-pickers/internals/demo";
+import dayjs, {Dayjs} from "dayjs";
 
 
 const ITEM_HEIGHT = 48;
@@ -37,7 +41,10 @@ const MenuProps = {
 
 const StudentUpdate: React.FC = () => {
     const [selectedClassIds, setSelectedClassIds] = React.useState<string[]>([]);
+    const [selectedClassNames, setSelectedClassNames] = React.useState<string[]>([]);
     const [studentName, setStudentName] = React.useState<string>("");
+    const [studentEnglishName, setStudentEnglishName] = React.useState<string>("");
+    const [tuitionDate, setTuitionDate] = React.useState<Dayjs | null>(null);
     const [classList, setClassList] = React.useState<Array<Class>>([]);
 
     const location = useLocation();
@@ -55,9 +62,12 @@ const StudentUpdate: React.FC = () => {
         targetStudent = new Student(
             new StudentId(studentObject._id._id),
             classIdList,
+            studentObject._classNameList,
             studentObject._name,
+            studentObject._englishName,
             studentObject._createdAt,
-            studentObject._updatedAt
+            studentObject._updatedAt,
+            studentObject._tuitionDate,
         );
     }
 
@@ -70,30 +80,53 @@ const StudentUpdate: React.FC = () => {
         if (mode === 'update') {
             const classIdStringList: Array<string> = targetStudent.classIdList.map((classId: ClassId) => classId.id);
             setStudentName(targetStudent.name);
+            setStudentEnglishName(targetStudent.englishName);
             setSelectedClassIds(classIdStringList);
+            setTuitionDate(dayjs(targetStudent.tuitionDate));
+
+            setSelectedClassNames(targetStudent.classNameList);
         }
     }, []);
 
 
     const updateStudent = async () => {
-        const newClassList: Array<ClassId> = selectedClassIds.map((classId: string) => new ClassId(classId));
+        if (studentName === "" || studentName === null || studentName === undefined) return;
+        if (tuitionDate === null || tuitionDate === undefined) return;
+
+        const newClassIdList: Array<ClassId> = selectedClassNames.map((name: string) => {
+            const targetClass: Class | undefined = classList.find((classObject: Class) => classObject.name === name);
+            if (targetClass === undefined) throw "error";
+            else return targetClass.id;
+        });
+
         targetStudent.changeName(studentName);
-        targetStudent.changeClassIdList(newClassList);
+        targetStudent.changeEnglishName(studentEnglishName);
+        targetStudent.changeClassIdList(newClassIdList);
+        targetStudent.changeClassNameList(selectedClassNames);
+        targetStudent.changeTuitionDate(tuitionDate.toDate());
         const isSuccess: boolean = await studentService.updateStudentBothStoreAndCache(targetStudent);
         if (isSuccess) navigate(-1);
     };
 
     const createStudent = async () => {
         if (studentName === "" || studentName === null || studentName === undefined) return;
+        if (tuitionDate === null || tuitionDate === undefined) return;
 
-        const classIdList: Array<ClassId> = selectedClassIds.map((id: string) => new ClassId(id));
+        const classIdList: Array<ClassId> = selectedClassNames.map((name: string) => {
+            const targetClass: Class | undefined = classList.find((classObject: Class) => classObject.name === name);
+            if (targetClass === undefined) throw "error";
+            else return targetClass.id;
+        });
 
         const newStudent: Student = new Student(
             new StudentId("none"),
             classIdList,
+            selectedClassNames,
             studentName,
+            studentEnglishName,
             new Date(),
-            new Date()
+            new Date(),
+            tuitionDate.toDate()
         );
 
         const student: Student = await studentService.createStudent(newStudent);
@@ -101,15 +134,19 @@ const StudentUpdate: React.FC = () => {
         navigate(-1);
     };
 
-    const handleSelectChange = (event: SelectChangeEvent<typeof selectedClassIds>) => {
+    const handleSelectChange = (event: SelectChangeEvent<typeof selectedClassNames>) => {
         const {
             target: { value },
         } = event;
-        setSelectedClassIds(typeof value === 'string' ? value.split(',') : value);
+        setSelectedClassNames(typeof value === 'string' ? value.split(',') : value);
     };
 
-    const handleTextFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleStudentNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setStudentName(event.target.value);
+    };
+
+    const handleStudentEnglishNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setStudentEnglishName(event.target.value);
     };
 
     return <Scaffold>
@@ -137,7 +174,28 @@ const StudentUpdate: React.FC = () => {
                 value={studentName}
                 placeholder="student name"
                 variant="standard"
-                onChange={handleTextFieldChange}
+                onChange={handleStudentNameChange}
+                size="small"
+                sx={{ width: "200px" }}
+            />
+        </FlexContainer>
+        <FlexContainer flexWrap='wrap' {...{marginLeft: "20px"}}>
+            <Typography
+                sx={{
+                    m: "20px",
+                    fontSize: { xs: '15px', sm: "20px" }
+                }}
+            >
+                Input student english name
+            </Typography>
+            <TextField
+                required
+                label="Required"
+                // defaultValue=""
+                value={studentEnglishName}
+                placeholder="student name"
+                variant="standard"
+                onChange={handleStudentEnglishNameChange}
                 size="small"
                 sx={{ width: "200px" }}
             />
@@ -155,7 +213,7 @@ const StudentUpdate: React.FC = () => {
                 <InputLabel>Choose class</InputLabel>
                 <Select
                     multiple
-                    value={selectedClassIds}
+                    value={selectedClassNames}
                     onChange={handleSelectChange}
                     input={<OutlinedInput label="Choose class" />}
                     renderValue={(selected) => (
@@ -169,14 +227,33 @@ const StudentUpdate: React.FC = () => {
                 >
                     {classList.map((classObject: Class) => (
                         <MenuItem
-                            key={classObject.idString}
-                            value={classObject.idString}
+                            key={classObject.name}
+                            value={classObject.name}
                         >
-                            {classObject.idString}
+                            {classObject.name}
                         </MenuItem>
                     ))}
                 </Select>
             </FormControl>
+        </FlexContainer>
+        <FlexContainer flexWrap='wrap' {...{marginLeft: "20px"}}>
+            <Typography
+                sx={{
+                    m: "20px",
+                    fontSize: { xs: '15px', sm: "20px" }
+                }}
+            >
+                Select tuition date
+            </Typography>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={['DatePicker']}>
+                    <DatePicker
+                        label="Choose tuition date"
+                        value={tuitionDate}
+                        onChange={(newValue) => setTuitionDate(newValue)}
+                    />
+                </DemoContainer>
+            </LocalizationProvider>
         </FlexContainer>
         <FlexContainer width="100%" justifyContent="flex-end" {...{ padding: "20px" }}>
             <Fab variant="extended" color="primary" onClick={mode === 'create' ? createStudent : updateStudent}>

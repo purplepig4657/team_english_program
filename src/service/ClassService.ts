@@ -26,12 +26,18 @@ export default class ClassService {
 
     public async createClass(classObject: Class): Promise<Class | null> {
         if (classObject.idString.includes(' ')) return null;
-        if (await this.classIdIsExist(classObject.id)) return null;
+        if (await this.classNameIsExist(classObject.name)) return null;
         return await this._classRepository.create(classObject);
     }
 
     public async getClass(id: ClassId): Promise<Class | null> {
         return await this._classRepository.get(id);
+    }
+
+    public async getClassName(id: ClassId): Promise<string | null> {
+        const classObject = await this.getClass(id);
+        if (classObject === null) return null;
+        else return classObject.name;
     }
 
     public async getAllClass(): Promise<Array<Class>> {
@@ -46,6 +52,14 @@ export default class ClassService {
         const classList: Array<Class> = await this.getAllClass();
         for (let classObject of classList) {
             if (classObject.idString === id.id) return true;
+        }
+        return false;
+    }
+
+    public async classNameIsExist(name: string): Promise<boolean> {
+        const classList: Array<Class> = await this.getAllClass();
+        for (let classObject of classList) {
+            if (classObject.name === name) return true;
         }
         return false;
     }
@@ -74,7 +88,7 @@ export default class ClassService {
             promiseList.push(this.addStudentLectureIssue(id, new StudentLectureIssue(
                 new StudentLectureIssueId("none"), id, newLecture.id, student.id,
                 false, false, false, false,
-                null, null, null, null
+                null, null, null, null, null
             )));
         }
         await Promise.all(promiseList);

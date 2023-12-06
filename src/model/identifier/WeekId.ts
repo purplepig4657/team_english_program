@@ -6,6 +6,11 @@ export default class WeekId extends BaseId {
     //     super(id);
     // }
 
+    get formedId(): string {
+        const splitId: Array<string> = this.id.split("-");
+        return splitId[0] + "-" + splitId[1] + "-W" + splitId[2];
+    }
+
     public static thisWeek(): WeekId {
         const currentDate = this.getMonday(new Date());
         return WeekId.getWeekId(currentDate);

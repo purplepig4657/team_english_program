@@ -53,7 +53,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
                     Hello, world!
                 </Typography>
                 <Typography variant="h5" component="div">
-                    {classObject.id.id}
+                    {classObject.name}
                 </Typography>
                 <Typography sx={{ mt: 1 }} color="text.secondary">
                     {studentCount} students
@@ -61,13 +61,13 @@ const ClassCard: React.FC<ClassCardProps> = ({
             </CardContent>
             <CardActions>
                 <Button size="small" onClick={() => classInfoClick(classObject)}>Enter</Button>
-                {false && <IconButton
+                {editMode && <IconButton
                     size="small"
                     onClick={() => classUpdateClick(classObject)}
                     sx={{ mr: 1 }}
                 >
                     <EditIcon />
-                </IconButton>}  {/* disable edit button now */}
+                </IconButton>}
                 {editMode && <IconButton
                     size="small"
                     color="warning"

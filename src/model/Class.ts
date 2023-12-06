@@ -8,16 +8,18 @@ import ClassId from "./identifier/ClassId";
 
 export default class Class {
     private _id: ClassId;  // Same with class name.
+    private _name: string;
     private _disabled: boolean;
 
-    public constructor(id: ClassId, disabled: boolean | null) {
+    public constructor(id: ClassId, name: string, disabled: boolean | null) {
         this._id = id;
+        this._name = name;
         if (disabled === null) this._disabled = false;
         else this._disabled = disabled;
     }
 
-    public changeClassId(newId: ClassId) {
-        this._id = newId;
+    public changeClassName(newName: string) {
+        this._name = newName;
     }
 
     public disableClass() {
@@ -34,6 +36,10 @@ export default class Class {
         return this._id;
     }
 
+    get name(): string {
+        return this._name;
+    }
+
     get disabled(): boolean {
         return this._disabled;
     }
@@ -46,6 +52,7 @@ export default class Class {
 
 interface ClassDBModel extends DocumentData {
     id: string;
+    name: string;
     disabled: boolean | null;
 }
 
@@ -53,6 +60,7 @@ export const classConverter: FirestoreDataConverter<Class, ClassDBModel> = {
     toFirestore: (classData: Class): ClassDBModel => {
         return {
             id: classData.idString,
+            name: classData.name,
             disabled: classData.disabled
         };
     },
@@ -64,6 +72,7 @@ export const classConverter: FirestoreDataConverter<Class, ClassDBModel> = {
 
         return new Class(
             new ClassId(snapshot.id),
+            data.name,
             data.disabled
         );
     }

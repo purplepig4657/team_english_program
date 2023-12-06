@@ -8,7 +8,6 @@ import { db } from "../../config/firebaseConfig";
 import ClassRepository from "../interface/ClassRepository";
 import Class, { classConverter } from "../../model/Class";
 import ClassId from "../../model/identifier/ClassId";
-import StudentId from "../../model/identifier/StudentId";
 import Lecture, {lectureConverter} from "../../model/Lecture";
 import LectureId from "../../model/identifier/LectureId";
 import StudentLectureIssue, {studentLectureIssueConverter} from "../../model/StudentLectureIssue";
@@ -22,9 +21,15 @@ import {
 export default class ClassRepositoryImpl implements ClassRepository {
 
     async create(t: Class): Promise<Class> {
-        const newClassRef = doc(collection(db, CLASS_COLLECTION), t.idString).withConverter(classConverter);
-        await setDoc(newClassRef, t);
-        return t;
+        const newClassRef = doc(collection(db, CLASS_COLLECTION)).withConverter(classConverter);
+        const newClassId: string = newClassRef.id;
+        const newClass = new Class(
+            new ClassId(newClassId),
+            t.name,
+            t.disabled
+        );
+        await setDoc(newClassRef, newClass);
+        return newClass;
     }
 
     async get(id: ClassId): Promise<Class | null> {
@@ -109,7 +114,8 @@ export default class ClassRepositoryImpl implements ClassRepository {
             studentLectureIssue.latenessComment,
             studentLectureIssue.absenceComment,
             studentLectureIssue.attitudeComment,
-            studentLectureIssue.scoreIssueComment
+            studentLectureIssue.scoreIssueComment,
+            studentLectureIssue.goodComment,
         );
         // TODO: 예외 처리
         await setDoc(studentLectureIssueRef, newStudentLectureIssue).then(() => true).catch(() => false);

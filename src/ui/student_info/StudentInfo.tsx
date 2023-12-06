@@ -1,6 +1,16 @@
 import React, {useEffect, useState} from "react";
 import Scaffold from "../../components/Scaffold";
-import {Fab, Grid, Paper, Typography} from "@mui/material";
+import {
+    Fab,
+    FormControl,
+    Grid,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    SelectChangeEvent,
+    Typography
+} from "@mui/material";
 import Student from "../../model/Student";
 import {useLocation} from "react-router";
 import FlexContainer from "../../components/FlexContainer";
@@ -16,6 +26,7 @@ import StudentIssue from "../../model/StudentIssue";
 import AddIcon from "@material-ui/icons/Add";
 import MinusIcon from "@material-ui/icons/Remove";
 import StudentIssueId from "../../model/identifier/StudentIssueId";
+import ClassLectureComments from "./component/ClassLectureComments";
 
 
 interface StudentInfoProps {
@@ -41,6 +52,7 @@ const SCREEN_SIZE_MARGIN = 60;
 const StudentInfo: React.FC<StudentInfoProps> = ({
      drawerWidth
 }) => {
+    const [weekSelect, setWeekSelect] = useState<string>(WeekId.thisWeek().id);
     const [screenWidthNumeric, setScreenWidthNumeric] = useState(window.innerWidth);
     const [data, setData] = React.useState<IssueDataInterface>({
         calculated: [],
@@ -62,9 +74,12 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
     const student: Student = new Student(
         new StudentId(studentObject._id._id),
         classIdList,
+        studentObject._classNameList,
         studentObject._name,
+        studentObject._englishName,
         studentObject._createdAt,
         studentObject._updatedAt,
+        studentObject._tuitionDate,
     );
 
     useEffect(() => {
@@ -82,7 +97,7 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
             for (let i = 0; i < 5; i++) {
                 const weekIssue: StudentWeekIssue | null =
                     await studentWeekIssueService.getStudentWeekIssueByWeekId(student.id, weekId);
-                if (i === 0) thisWeekIssueTmp = weekIssue;
+                if (weekIssue?.weekId.id === weekSelect) thisWeekIssueTmp = weekIssue;
                 if (weekIssue === null) {
                     data.calculated.push({ name: 'None', issueScore: 0 });
                     data.lateness.push({ name: 'None', issueScore: 0 });
@@ -129,7 +144,7 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
             // cleanup
             window.removeEventListener("resize", screenResize);
         };
-    }, [drawerWidth]);
+    }, [drawerWidth, weekSelect]);
 
     const consultationClick = async (mode: 'plus' | 'minus') => {
         if (studentIssue === null) return;
@@ -142,25 +157,54 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
         }
     };
 
+    const weekList: Array<WeekId> = [];
+    let weekTmp: WeekId = WeekId.thisWeek();
+
+    for (let i = 0; i < 5; i++) {
+        weekList.push(weekTmp);
+        weekTmp = weekTmp.lastWeekFromSelf();
+    }
+
+    const handleWeekSelectChange = (event: SelectChangeEvent) => {
+        setWeekSelect(event.target.value as string);
+    };
+
     return <Scaffold>
-        <FlexContainer alignItems={'center'}>
-            <Typography
-                sx={{
-                    m: "20px",
-                    mr: "8px",
-                    fontSize: { xs: '30px', sm: "35px" }
-                }}
-            >
-                {student.name}
-            </Typography>
-            <Typography
-                sx={{
-                    m: "20px 0",
-                    fontSize: { xs: '20px', sm: "25px" }
-                }}
-            >
-                {" / " + student.getClassIdListString()}
-            </Typography>
+        <FlexContainer justifyContent="space-between" alignItems="center">
+            <FlexContainer alignItems="flex-end">
+                <Typography
+                    sx={{
+                        m: "20px",
+                        mr: "8px",
+                        fontSize: { xs: '20px', sm: "25px" }
+                    }}
+                >
+                    {`${student.name} (${student.englishName})`}
+                </Typography>
+                <Typography
+                    sx={{
+                        m: "20px 0",
+                        fontSize: { xs: '20px', sm: "25px" }
+                    }}
+                >
+                    {" / " + student.getClassNameListString()}
+                </Typography>
+            </FlexContainer>
+            <FormControl sx={{ width: 200, mr: 5 }}>
+                <InputLabel>Select a week</InputLabel>
+                <Select
+                    value={weekSelect}
+                    label="Select a week"
+                    onChange={handleWeekSelectChange}
+                >
+                    {weekList
+                        .map((weekId: WeekId) => {
+                            return <MenuItem key={weekId.id} value={weekId.id}>{weekId.formedId}</MenuItem>
+                        })
+
+                    }
+                </Select>
+            </FormControl>
         </FlexContainer>
         <Typography
             sx={{
@@ -168,7 +212,7 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
                 fontSize: { xs: '20px', sm: "25px" }
             }}
         >
-            {WeekId.thisWeek().id}
+            {(new WeekId(weekSelect)).formedId}
         </Typography>
         <FlexContainer flexDirection='column' {...{ padding: "20px" }}>
             <Box sx={{ flexGrow: 1 }}>
@@ -261,6 +305,15 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
                     </ResponsiveContainer>
                 </Box>
             </FlexContainer>
+            {student.classIdList
+                .map((classId: ClassId) => {
+                    return <ClassLectureComments
+                        classId={classId}
+                        weekId={new WeekId(weekSelect)}
+                        studentId={student.id}
+                    />
+                })
+            }
             <Paper sx={{ margin: "30px", padding: "20px", minHeight: "200px" }}>
                 <FlexContainer>
                     <FlexContainer flexDirection="column">

@@ -27,9 +27,12 @@ export default class StudentRepositoryImpl implements StudentRepository {
         const newStudent = new Student(
             new StudentId(newStudentId),
             t.classIdList,
+            t.classNameList,
             t.name,
+            t.englishName,
             new Date(),
-            new Date()
+            new Date(),
+            t.tuitionDate,
         );
         await setDoc(newStudentRef, newStudent);
         return newStudent;

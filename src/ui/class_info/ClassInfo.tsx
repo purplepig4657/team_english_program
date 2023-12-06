@@ -28,6 +28,7 @@ const ClassInfo: React.FC<ClassInfoProps> = ({
 
     const classObject: Class = new Class(
         new ClassId(classInfo._id._id),
+        classInfo._name,
         classInfo._disabled
     );
 
@@ -47,7 +48,8 @@ const ClassInfo: React.FC<ClassInfoProps> = ({
         navigate("/lecture_update", {
             state: {
                 classId: classObject.id,
-                weekId: new WeekId(weekSelect)
+                weekId: new WeekId(weekSelect),
+                className: classObject.name
             }
         });
     };
@@ -60,7 +62,7 @@ const ClassInfo: React.FC<ClassInfoProps> = ({
                     fontSize: { xs: '30px', sm: "40px" }
                 }}
             >
-                {classObject.idString}
+                {classObject.name}
             </Typography>
             <FormControl sx={{ width: 200, mr: 5 }}>
                 <InputLabel>Select a week</InputLabel>
@@ -71,7 +73,7 @@ const ClassInfo: React.FC<ClassInfoProps> = ({
                 >
                     {weekList
                         .map((weekId: WeekId) => {
-                            return <MenuItem key={weekId.id} value={weekId.id}>{weekId.id}</MenuItem>
+                            return <MenuItem key={weekId.id} value={weekId.id}>{weekId.formedId}</MenuItem>
                         })
 
                     }

@@ -3,14 +3,11 @@ import Scaffold from "../../components/Scaffold";
 import {Typography} from "@mui/material";
 import FlexContainer from "../../components/FlexContainer";
 import Student from "../../model/Student";
-import StudentId from "../../model/identifier/StudentId";
-import ClassId from "../../model/identifier/ClassId";
 import Box from "@mui/material/Box";
 import StudentIssue from "../../model/StudentIssue";
 import IssuedStudentTable from "./component/IssuedStudentTable";
 import {studentIssueService, studentService} from "../../service/provider/ServiceProvider";
-import ClassService from "../../service/ClassService";
-import Class from "../../model/Class";
+import TuitionIssuedStudentTable from "./component/TuitionIssuedStudentTable";
 
 
 interface DashboardProps {
@@ -22,13 +19,14 @@ const Dashboard: React.FC<DashboardProps> = ({
     drawerWidth
 }) => {
     const [issuedStudentList, setIssuedStudentList] = useState<Array<[Student, StudentIssue]>>([]);
+    const [tuitionIssuedStudentList, setTuitionIssuedStudentList] = useState<Array<Student>>([]);
 
     useEffect(() => {
         (async () => {
-            const _studentService = studentService;
-            const _studentIssueService = studentIssueService;
             const issuedStudentList = await studentIssueService.getAllIssueStudentList();
+            const tuitionIssuedStudentList = await studentService.getAllTuitionIssueStudentList();
             setIssuedStudentList(issuedStudentList);
+            setTuitionIssuedStudentList(tuitionIssuedStudentList);
         })();
     }, []);
 
@@ -59,15 +57,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 >
                     Tuition issue
                 </Typography>
-                <Box sx={{
-                    width: '100%',
-                    height: 'auto',
-                    minHeight: '200px',
-                    backgroundColor: 'lightblue',
-                    margin: '10px 0'
-                }}>
-                    {/* Tuition List */}
-                </Box>
+                <TuitionIssuedStudentTable studentList={tuitionIssuedStudentList} />
             </FlexContainer>
         </FlexContainer>
     </Scaffold>;

@@ -130,7 +130,10 @@ const ClassStudentsInfo: React.FC<ClassStudentsInfoProps> = ({
                                         <PersonIcon />
                                     </Avatar>
                                 </ListItemAvatar>
-                                <ListItemText primary={student.name} secondary={student.getClassIdListString()} />
+                                <ListItemText
+                                    primary={`${student.name} (${student.englishName})`}
+                                    secondary={student.getClassNameListString()}
+                                />
                             </ListItem>
                         )
                     }

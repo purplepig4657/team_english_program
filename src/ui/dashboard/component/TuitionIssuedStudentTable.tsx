@@ -1,23 +1,15 @@
 import Student from "../../../model/Student";
-import StudentIssue from "../../../model/StudentIssue";
 import React from "react";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import {useNavigate} from "react-router-dom";
 
-interface IssuedStudentTableProps {
-    studentAndScoreList: Array<[Student, StudentIssue]>;
+interface TuitionIssuedStudentTableProps {
+    studentList: Array<Student>;
 }
 
 
-const IssuedStudentTable: React.FC<IssuedStudentTableProps> = ({
-   studentAndScoreList
+const TuitionIssuedStudentTable: React.FC<TuitionIssuedStudentTableProps> = ({
+    studentList
 }) => {
-    const navigate = useNavigate();
-
-    const studentInfoClick = (student: Student) => {
-        navigate("/student_info", { state: { student: student } })
-    }
-
     return (
         <TableContainer component={Paper} sx={{margin: "10px 0", maxHeight: 300}}>
             <Table stickyHeader sx={{ minWidth: 400 }}>
@@ -25,18 +17,15 @@ const IssuedStudentTable: React.FC<IssuedStudentTableProps> = ({
                     <TableRow>
                         <TableCell>Student Name</TableCell>
                         <TableCell>Classes</TableCell>
-                        <TableCell align="right">Issue score</TableCell>
-                        <TableCell align="right">consultation count</TableCell>
+                        <TableCell align="right">Tuition Date</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {studentAndScoreList.map(([student, studentIssue]) => {
+                    {studentList.map((student) => {
                         return (
                             <TableRow
-                                hover
                                 key={student.id.id}
                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
-                                onClick={(event) => studentInfoClick(student)}
                             >
                                 <TableCell component="th" scope="row">
                                     {student.name}
@@ -44,8 +33,11 @@ const IssuedStudentTable: React.FC<IssuedStudentTableProps> = ({
                                 <TableCell component="th" scope="row">
                                     {student.getClassNameListString()}
                                 </TableCell>
-                                <TableCell align="right">{studentIssue.getIssueScore()}</TableCell>
-                                <TableCell align="right">{studentIssue.consultation}</TableCell>
+                                <TableCell align="right">
+                                    {student.tuitionDate.getFullYear() +
+                                        "-" + (student.tuitionDate.getMonth() + 1) +
+                                        "-" + student.tuitionDate.getDate()}
+                                </TableCell>
                             </TableRow>
                         )
                     })}
@@ -55,4 +47,4 @@ const IssuedStudentTable: React.FC<IssuedStudentTableProps> = ({
     );
 }
 
-export default IssuedStudentTable;
+export default TuitionIssuedStudentTable;

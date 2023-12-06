@@ -17,7 +17,8 @@ export default class StudentCache {
     }
 
     public async getCachedStudentList(): Promise<Array<Student>> {
-        const lastCreatedStudent: Student = await this._studentRepository.getLastCreatedStudent();
+        const lastCreatedStudent: Student | undefined = await this._studentRepository.getLastCreatedStudent();
+        if (lastCreatedStudent === undefined) return [];
         if (this._lastCreatedStudentDate === null || this._lastCreatedStudentDate < lastCreatedStudent.createdAt) {
             console.log("cache updated");
             this._lastCreatedStudentDate = lastCreatedStudent.updatedAt;
@@ -38,7 +39,9 @@ export default class StudentCache {
         );
         if (targetStudent === undefined) return false;
         targetStudent.changeName(updatedStudent.name);
+        targetStudent.changeEnglishName(updatedStudent.englishName);
         targetStudent.changeClassIdList(updatedStudent.classIdList);
+        targetStudent.changeClassNameList(updatedStudent.classNameList);
         targetStudent.changeUpdatedAt(updatedStudent.updatedAt);
         return true;
     }
