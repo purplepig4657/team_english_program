@@ -54,7 +54,7 @@ const ClassLecturesInfo: React.FC<ClassLecturesInfoProps> = ({
                 >
                     {lectureList
                         .map((lecture: Lecture) => {
-                            return <Tab key={lecture.idString} label={lecture.name} />
+                            return <Tab key={lecture.idString} label={`${lecture.name} / ${lecture.teacherName}`} />
                         })
                     }
                 </Tabs>

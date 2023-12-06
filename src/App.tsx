@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import Dashboard from './ui/dashboard/Dashboard';
 import StudentList from './ui/student_list/StudentList';
@@ -7,7 +7,6 @@ import ClassList from './ui/class_list/ClassList';
 import ClassInfo from './ui/class_info/ClassInfo';
 import ClassManage from './ui/class_manage/ClassManage';
 import WeightManage from './ui/weight_manage/WeightManage';
-
 import './App.css';
 import AppbarAndDrawer from './components/AppbarAndDrawer';
 import {useMediaQuery} from "react-responsive";
@@ -15,17 +14,38 @@ import {DRAWER_WIDTH, MOBILE_SCREEN_MAX_WIDTH} from "./constants/GlobalConstants
 import StudentUpdate from "./ui/student_update/StudentUpdate";
 import ClassUpdate from "./ui/class_update/ClassUpdate";
 import LectureUpdate from "./ui/lecture_update/LectureUpdate";
+import {
+    setConstantWeight,
+    setGlobalAbsenceWeight, setGlobalAttitudeWeight, setGlobalConsultationWeight,
+    setGlobalIssueThreshold,
+    setGlobalLatenessWeight, setGlobalScoreIssueWeight
+} from "./constants/GlobalWeight";
+import ConstantWeight from "./model/ConstantWeight";
+import {constantWeightService} from "./service/provider/ServiceProvider";
 
 
 function App() {
     const isMobileScreen = useMediaQuery({ maxWidth: MOBILE_SCREEN_MAX_WIDTH });
     let drawerWidth;
-    let screenWidth;
+    // let screenWidth;
 
     if (isMobileScreen) drawerWidth = 0;
     else drawerWidth = DRAWER_WIDTH;
 
-    screenWidth = `calc(100vw - ${drawerWidth}px)`;
+    useEffect(() => {
+        (async () => {
+            const constantWeight: ConstantWeight = await constantWeightService.getConstantWeight();
+            setConstantWeight(constantWeight);
+            setGlobalIssueThreshold(constantWeight.issueThreshold);
+            setGlobalLatenessWeight(constantWeight.latenessWeight);
+            setGlobalAbsenceWeight(constantWeight.absenceWeight);
+            setGlobalAttitudeWeight(constantWeight.attitudeWeight);
+            setGlobalScoreIssueWeight(constantWeight.scoreIssueWeight);
+            setGlobalConsultationWeight(constantWeight.consultationWeight);
+        })();
+    }, []);
+
+    // screenWidth = `calc(100vw - ${drawerWidth}px)`;
 
     return (
         <HashRouter>

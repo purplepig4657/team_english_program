@@ -25,7 +25,6 @@ export default class ClassService {
     }
 
     public async createClass(classObject: Class): Promise<Class | null> {
-        if (classObject.idString.includes(' ')) return null;
         if (await this.classNameIsExist(classObject.name)) return null;
         return await this._classRepository.create(classObject);
     }
@@ -65,6 +64,7 @@ export default class ClassService {
     }
 
     public async updateClass(classObject: Class): Promise<boolean> {
+        if (await this.classNameIsExist(classObject.name)) return false;
         return await this._classRepository.update(classObject);
     }
 

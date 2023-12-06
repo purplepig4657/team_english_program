@@ -6,6 +6,7 @@ import StudentIssueCache from "../StudentIssueCache";
 import StudentWeekIssueService from "../StudentWeekIssueService";
 import LectureService from "../LectureService";
 import StudentLectureIssueService from "../StudentLectureIssueService";
+import ConstantWeightService from "../ConstantWeightService";
 
 export const classService = new ClassService();
 export const studentService = new StudentService();
@@ -15,3 +16,4 @@ export const studentIssueCache = new StudentIssueCache();
 export const studentWeekIssueService = new StudentWeekIssueService();
 export const lectureService = new LectureService();
 export const studentLectureIssueService = new StudentLectureIssueService();
+export const constantWeightService = new ConstantWeightService();

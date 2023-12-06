@@ -11,6 +11,8 @@ import {
 } from "../../constants/GlobalWeight";
 import NavigationIcon from "@material-ui/icons/Navigation";
 import {useNavigate} from "react-router-dom";
+import {constantWeightService} from "../../service/provider/ServiceProvider";
+import ConstantWeight from "../../model/ConstantWeight";
 
 const WeightManage = (): JSX.Element => {
     const [issueThreshold, setIssueThreshold] = useState<number>(0);
@@ -61,14 +63,22 @@ const WeightManage = (): JSX.Element => {
         setConsultationWeight(Number(numericValue));
     };
 
-    const submitChanges = () => {
+    const submitChanges = async () => {
         setGlobalIssueThreshold(issueThreshold);
         setGlobalLatenessWeight(latenessWeight);
         setGlobalAbsenceWeight(absenceWeight);
         setGlobalAttitudeWeight(attitudeWeight);
         setGlobalScoreIssueWeight(scoreIssueWeight);
         setGlobalConsultationWeight(consultationWeight);
-        navigate(-1);
+        const isSuccess = await constantWeightService.updateConstantWeight(new ConstantWeight(
+            issueThreshold,
+            latenessWeight,
+            absenceWeight,
+            attitudeWeight,
+            scoreIssueWeight,
+            consultationWeight
+        ));
+        if (isSuccess) navigate(-1);
     };
 
 

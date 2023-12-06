@@ -39,7 +39,7 @@ const IssuedStudentTable: React.FC<IssuedStudentTableProps> = ({
                                 onClick={(event) => studentInfoClick(student)}
                             >
                                 <TableCell component="th" scope="row">
-                                    {student.name}
+                                    {`${student.name} (${student.englishName})`}
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     {student.getClassNameListString()}

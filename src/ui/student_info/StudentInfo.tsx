@@ -25,7 +25,6 @@ import {ResponsiveContainer} from "recharts";
 import StudentIssue from "../../model/StudentIssue";
 import AddIcon from "@material-ui/icons/Add";
 import MinusIcon from "@material-ui/icons/Remove";
-import StudentIssueId from "../../model/identifier/StudentIssueId";
 import ClassLectureComments from "./component/ClassLectureComments";
 
 
@@ -170,7 +169,7 @@ const StudentInfo: React.FC<StudentInfoProps> = ({
     };
 
     return <Scaffold>
-        <FlexContainer justifyContent="space-between" alignItems="center">
+        <FlexContainer justifyContent="space-between" alignItems="flex-end">
             <FlexContainer alignItems="flex-end">
                 <Typography
                     sx={{

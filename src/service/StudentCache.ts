@@ -43,6 +43,7 @@ export default class StudentCache {
         targetStudent.changeClassIdList(updatedStudent.classIdList);
         targetStudent.changeClassNameList(updatedStudent.classNameList);
         targetStudent.changeUpdatedAt(updatedStudent.updatedAt);
+        targetStudent.changeTuitionDate(updatedStudent.tuitionDate);
         return true;
     }
 

@@ -67,45 +67,49 @@ const ClassLectureComments: React.FC<ClassLectureCommentsProps> = ({
                                 primary="lateness"
                                 secondary={
                                     <React.Fragment>
-                                        {` — ${lectureIssue[0].latenessComment}`}
+                                        {` — ${lectureIssue[0].latenessComment === null ? 
+                                            "not commented" : lectureIssue[0].latenessComment}`}
                                     </React.Fragment>
                                 }
                             />
                         </ListItem>}
-                        <Divider component="li" />
+                        {lectureIssue[0].lateness && <Divider component="li" />}
                         {lectureIssue[0].absence && <ListItem alignItems="flex-start">
                             <ListItemText
                                 primary="absence"
                                 secondary={
                                     <React.Fragment>
-                                        {` — ${lectureIssue[0].absenceComment}`}
+                                        {` — ${lectureIssue[0].absenceComment === null ?
+                                            "not commented" : lectureIssue[0].absenceComment}`}
                                     </React.Fragment>
                                 }
                             />
                         </ListItem>}
-                        <Divider component="li" />
+                        {lectureIssue[0].absence && <Divider component="li" />}
                         {lectureIssue[0].attitude && <ListItem alignItems="flex-start">
                             <ListItemText
                                 primary="attitude"
                                 secondary={
                                     <React.Fragment>
-                                        {` — ${lectureIssue[0].attitudeComment}`}
+                                        {` — ${lectureIssue[0].attitudeComment === null ?
+                                            "not commented" : lectureIssue[0].attitudeComment}`}
                                     </React.Fragment>
                                 }
                             />
                         </ListItem>}
-                        <Divider component="li" />
+                        {lectureIssue[0].attitude && <Divider component="li" />}
                         {lectureIssue[0].scoreIssue && <ListItem alignItems="flex-start">
                             <ListItemText
                                 primary="scoreIssue"
                                 secondary={
                                     <React.Fragment>
-                                        {` — ${lectureIssue[0].scoreIssueComment}`}
+                                        {` — ${lectureIssue[0].scoreIssueComment === null ?
+                                            "not commented" : lectureIssue[0].scoreIssueComment}`}
                                     </React.Fragment>
                                 }
                             />
                         </ListItem>}
-                        <Divider component="li" />
+                        {lectureIssue[0].scoreIssue && <Divider component="li" />}
                         {lectureIssue[0].goodComment !== null && <ListItem alignItems="flex-start">
                             <ListItemText
                                 primary="good"
@@ -116,7 +120,7 @@ const ClassLectureComments: React.FC<ClassLectureCommentsProps> = ({
                                 }
                             />
                         </ListItem>}
-                        <Divider component="li" />
+                        {lectureIssue[0].goodComment !== null && <Divider component="li" />}
                     </List>
                 </>
             })

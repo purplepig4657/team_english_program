@@ -28,7 +28,7 @@ const TuitionIssuedStudentTable: React.FC<TuitionIssuedStudentTableProps> = ({
                                 sx={{'&:last-child td, &:last-child th': {border: 0}}}
                             >
                                 <TableCell component="th" scope="row">
-                                    {student.name}
+                                    {`${student.name} (${student.englishName})`}
                                 </TableCell>
                                 <TableCell component="th" scope="row">
                                     {student.getClassNameListString()}
