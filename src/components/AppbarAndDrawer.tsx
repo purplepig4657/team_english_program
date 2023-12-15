@@ -18,6 +18,7 @@ import ClassIcon from '@material-ui/icons/Class';
 import TimelineIcon from '@material-ui/icons/Timeline';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ArrowBackIcon from '@material-ui/icons/ArrowBackIos';
+import AutorenewIcon from '@material-ui/icons/Autorenew';
 
 import { DRAWER_WIDTH } from '../constants/GlobalConstants';
 
@@ -55,6 +56,10 @@ export default function AppbarAndDrawer() {
           <ListItemIcon><TimelineIcon /></ListItemIcon>
           <ListItemText primary="Weight Management" />
         </ListItemButton>
+          <ListItemButton component={Link} to="/csv_service">
+              <ListItemIcon><AutorenewIcon /></ListItemIcon>
+              <ListItemText primary="CSV Auto Input" />
+          </ListItemButton>
       </List>
     </div>
   );

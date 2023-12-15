@@ -22,6 +22,7 @@ import {
 } from "./constants/GlobalWeight";
 import ConstantWeight from "./model/ConstantWeight";
 import {constantWeightService} from "./service/provider/ServiceProvider";
+import CSVService from "./ui/csv_service/CSVService";
 
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
             <Route path="/class_manage" Component={ ClassManage } />
             <Route path="/lecture_update" Component={ LectureUpdate } />
             <Route path="/weight_manage" Component={ WeightManage } />
+            <Route path="/csv_service" Component={ CSVService } />
           </Routes>
         </HashRouter>
     );
