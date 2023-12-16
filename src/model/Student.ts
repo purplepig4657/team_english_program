@@ -76,7 +76,7 @@ export default class Student {
         const currentDate = new Date();
         const comparableTuitionDate = new Date(
             currentDate.getFullYear(),
-            this.tuitionDate.getMonth(),
+            currentDate.getMonth(),
             this.tuitionDate.getDate()
         );
 
