@@ -41,7 +41,7 @@ const ClassCard: React.FC<ClassCardProps> = ({
 
     const disableClass = async (classObject: Class) => {
         classObject.disableClass();
-        await classService.updateClass(classObject);
+        await classService.disableClass(classObject);
         classDisableCallback(classObject);
     }
 

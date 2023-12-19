@@ -68,6 +68,11 @@ export default class ClassService {
         return await this._classRepository.update(classObject);
     }
 
+    public async disableClass(classObject: Class): Promise<boolean> {
+        classObject.disableClass();
+        return await this._classRepository.update(classObject);
+    }
+
     public async deleteClass(id: ClassId): Promise<boolean> {
         return await this._classRepository.delete(id);
     }
