@@ -9,6 +9,7 @@ import ClassId from "../../model/identifier/ClassId";
 import Student from "../../model/Student";
 import StudentId from "../../model/identifier/StudentId";
 import {useNavigate} from "react-router-dom";
+import languageEncoding from "detect-file-encoding-and-language";
 
 
 interface CSVForm {
@@ -19,6 +20,7 @@ interface CSVForm {
 }
 
 const csvToJSON = (csvString: string): CSVForm[] => {
+    console.log(csvString);
     const rows = csvString.split("\r\n");
     const jsonArray: CSVForm[] = [];
     const header = rows[0].split(",");
@@ -50,10 +52,33 @@ const CSVService: React.FC = () => {
         })();
     }, []);
 
+    function readCsvFromFile(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = (event) => {
+                const result = event.target?.result as string;
+
+                resolve(result);
+            };
+
+            reader.onerror = (error) => {
+                reject(error);
+            };
+
+            languageEncoding(file).then((fileInfo) => {
+                // 라이브러리 이슈. EUC-KR 인코딩 못 잡음. Github issue 올릴 예정.
+                const encoding: string = fileInfo.encoding === null ? 'EUC-KR' : fileInfo.encoding;
+                reader.readAsText(file, encoding);
+            });
+        });
+    }
+
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+        if (file === undefined) return;
         if (file) setSelectedFile(file);
-        file?.text().then((str: string) => setInputStudentList(csvToJSON(str)));
+        readCsvFromFile(file).then((str: string) => setInputStudentList(csvToJSON(str)));
     };
 
     const submit = async () => {
@@ -73,11 +98,12 @@ const CSVService: React.FC = () => {
             await classService.createClass(newClass);
         }
 
-        setClassList(await classService.getAllClass());
+        const allClassList: Array<Class> = await classService.getAllClass();
+        setClassList(allClassList);
 
         for (let inputStudent of inputStudentList) {
             const selectedClass: Class | undefined =
-                classList.find((classObject: Class) => classObject.name === inputStudent.className);
+                allClassList.find((classObject: Class) => classObject.name === inputStudent.className);
             if (selectedClass === undefined) continue;
 
             const newStudent: Student = new Student(
