@@ -52,7 +52,7 @@ const CSVService: React.FC = () => {
         })();
     }, []);
 
-    function readCsvFromFile(file: File): Promise<string> {
+    function readCSVFromFile(file: File): Promise<string> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
 
@@ -78,7 +78,7 @@ const CSVService: React.FC = () => {
         const file = event.target.files?.[0];
         if (file === undefined) return;
         if (file) setSelectedFile(file);
-        readCsvFromFile(file).then((str: string) => setInputStudentList(csvToJSON(str)));
+        readCSVFromFile(file).then((str: string) => setInputStudentList(csvToJSON(str)));
     };
 
     const submit = async () => {
