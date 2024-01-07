@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import ClassService from "../ClassService";
 import StudentService from "../StudentService";
 import StudentIssueService from "../StudentIssueService";
@@ -7,8 +8,10 @@ import StudentWeekIssueService from "../StudentWeekIssueService";
 import LectureService from "../LectureService";
 import StudentLectureIssueService from "../StudentLectureIssueService";
 import ConstantWeightService from "../ConstantWeightService";
+import diContainer from "../../config/di/iocConfig";
+import {SERVICE} from "../../config/di/constant/service";
 
-export const classService = new ClassService();
+export const classService = diContainer.get<ClassService>(SERVICE.ClassService);
 export const studentService = new StudentService();
 export const studentCache = new StudentCache();
 export const studentIssueService = new StudentIssueService();

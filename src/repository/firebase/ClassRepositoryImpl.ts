@@ -1,3 +1,5 @@
+import "reflect-metadata";
+import { injectable } from "inversify";
 import {
     doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, arrayUnion, arrayRemove, collection,
     DocumentSnapshot, QueryDocumentSnapshot, QuerySnapshot,
@@ -18,6 +20,7 @@ import {
     STUDENT_LECTURE_ISSUE_COLLECTION
 } from "../common/firebaseCollectionNames";
 
+@injectable()
 export default class ClassRepositoryImpl implements ClassRepository {
 
     async create(t: Class): Promise<Class> {

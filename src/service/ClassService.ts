@@ -1,5 +1,5 @@
+import "reflect-metadata";
 import ClassRepository from "../repository/interface/ClassRepository";
-import ClassRepositoryImpl from "../repository/firebase/ClassRepositoryImpl";
 import Class from "../model/Class";
 import ClassId from "../model/identifier/ClassId";
 import Student from "../model/Student";
@@ -8,20 +8,18 @@ import Lecture from "../model/Lecture";
 import LectureId from "../model/identifier/LectureId";
 import StudentLectureIssue from "../model/StudentLectureIssue";
 import StudentLectureIssueId from "../model/identifier/StudentLectureIssueId";
+import diContainer from "../config/di/iocConfig";
+import {REPOSITORY} from "../config/di/constant/repository";
+import {injectable} from "inversify";
 
+@injectable()
 export default class ClassService {
 
-    private static instance: ClassService;
 
     private _classRepository: ClassRepository;
 
     constructor() {
-        this._classRepository = new ClassRepositoryImpl();
-    }
-
-    public static getInstance() {
-        if (!ClassService.instance) ClassService.instance = new ClassService();
-        return ClassService.instance;
+        this._classRepository = diContainer.get<ClassRepository>(REPOSITORY.ClassRepository);
     }
 
     public async createClass(classObject: Class): Promise<Class | null> {
